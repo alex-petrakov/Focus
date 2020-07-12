@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <!-- Material theme colors -->
+    <color name="colorPrimary">#000</color>
+    <color name="colorPrimaryVariant">#000</color>
+    <color name="colorOnPrimary">#FFF</color>
+    <color name="colorSecondary">#000</color>
+    <color name="colorSecondaryVariant">#000</color>
+    <color name="colorOnSecondary">#FFF</color>
+    <color name="colorError">#CF0000</color>
+    <color name="colorOnError">#FFF</color>
+    <color name="colorBackground">#FFF</color>
+    <color name="colorOnBackground">#000</color>
+    <color name="colorSurface">#FFF</color>
+    <color name="colorOnSurface">#000</color>
+
+    <!-- Custom colors -->
+    <color name="colorSurfaceDark">#757575</color>
 </resources>

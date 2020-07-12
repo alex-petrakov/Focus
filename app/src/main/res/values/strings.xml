@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Focus</string>
+
+    <string name="app_action_start">Start</string>
+    <string name="app_action_pause">Pause</string>
+    <string name="app_action_resume">Resume</string>
+    <string name="app_action_reset">Reset</string>
 </resources>
