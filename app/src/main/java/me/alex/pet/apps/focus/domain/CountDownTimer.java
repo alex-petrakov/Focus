@@ -1,4 +1,6 @@
 /*
+ * THE ORIGINAL FILE HAS BEEN MODIFIED. THE FOLLOWING IS THE COPYRIGHT OF THE ORIGINAL DOCUMENT:
+ *
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,10 +57,14 @@ public abstract class CountDownTimer {
     private final long mCountdownInterval;
     private long mStopTimeInFuture;
 
+    private long mRemainingMillis;
+
     /**
      * boolean representing if the timer was cancelled
      */
     private boolean mCancelled = false;
+
+    private boolean mPaused = false;
 
     /**
      * @param millisInFuture    The number of millis in the future from the call
@@ -69,6 +75,7 @@ public abstract class CountDownTimer {
      */
     public CountDownTimer(long millisInFuture, long countDownInterval) {
         mMillisInFuture = millisInFuture;
+        mRemainingMillis = millisInFuture;
         mCountdownInterval = countDownInterval;
     }
 
@@ -77,6 +84,7 @@ public abstract class CountDownTimer {
      */
     public synchronized final void cancel() {
         mCancelled = true;
+        mPaused = false;
         mHandler.removeMessages(MSG);
     }
 
@@ -85,6 +93,7 @@ public abstract class CountDownTimer {
      */
     public synchronized final CountDownTimer start() {
         mCancelled = false;
+        mPaused = false;
         if (mMillisInFuture <= 0) {
             onFinish();
             return this;
@@ -92,6 +101,32 @@ public abstract class CountDownTimer {
         mStopTimeInFuture = SystemClock.elapsedRealtime() + mMillisInFuture;
         mHandler.sendMessage(mHandler.obtainMessage(MSG));
         return this;
+    }
+
+    /**
+     * Pause the countdown without cancelling it. Any attempt to pause a cancelled or paused countdown
+     * produces no effect.
+     */
+    public synchronized final void pause() {
+        if (mCancelled || mPaused) {
+            return;
+        }
+        mPaused = true;
+        mRemainingMillis = mStopTimeInFuture - SystemClock.elapsedRealtime();
+        mHandler.removeMessages(MSG);
+    }
+
+    /**
+     * Resume the countdown after it has been paused. Any attempt to resume a cancelled or resumed
+     * countdown produces no effect.
+     */
+    public synchronized final void resume() {
+        if (mCancelled || !mPaused) {
+            return;
+        }
+        mPaused = false;
+        mStopTimeInFuture = SystemClock.elapsedRealtime() + mRemainingMillis;
+        mHandler.sendMessage(mHandler.obtainMessage(MSG));
     }
 
     /**
@@ -112,7 +147,7 @@ public abstract class CountDownTimer {
         @Override
         public void handleMessage(Message msg) {
             synchronized (CountDownTimer.this) {
-                if (mCancelled) {
+                if (mCancelled || mPaused) {
                     return;
                 }
                 final long millisLeft = mStopTimeInFuture - SystemClock.elapsedRealtime();
