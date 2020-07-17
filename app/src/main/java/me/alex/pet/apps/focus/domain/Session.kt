@@ -4,14 +4,15 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.SystemClock
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit.MILLISECONDS
+import java.util.concurrent.TimeUnit.SECONDS
 
 class Session(
         val type: SessionType,
-        durationMinutes: Long
+        durationSeconds: Long
 ) {
 
-    private val durationMillis: Long = MINUTES.toMillis(durationMinutes)
+    private val durationMillis: Long = SECONDS.toMillis(durationSeconds)
 
     private val countdownIntervalMillis: Long = SECONDS.toMillis(1)
 
