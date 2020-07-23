@@ -5,4 +5,10 @@
     <string name="app_action_pause">Pause</string>
     <string name="app_action_resume">Resume</string>
     <string name="app_action_reset">Reset</string>
+    <string name="app_start_work_session">Start work session</string>
+
+    <string name="empty" />
+
+    <string name="timer_completed_sessions_format">%1$d completed</string>
+    <string name="app_start_break_session">Start break session</string>
 </resources>
