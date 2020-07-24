@@ -19,13 +19,15 @@ class TimerModel(
 
     val viewState: LiveData<ViewState> get() = _viewState
 
+    private val pomodoroObserver = object : Pomodoro.Observer {
+        override fun onUpdate() {
+            _viewState.value = pomodoro.toViewState()
+        }
+    }
+
     init {
         _viewState.value = pomodoro.toViewState()
-        pomodoro.addObserver(object : Pomodoro.Observer {
-            override fun onUpdate() {
-                _viewState.value = pomodoro.toViewState()
-            }
-        })
+        pomodoro.addObserver(pomodoroObserver)
     }
 
     fun onToggleTimer() {
@@ -41,6 +43,10 @@ class TimerModel(
             switchToNextSession()
             startSession()
         }
+    }
+
+    override fun onCleared() {
+        pomodoro.removeObserver(pomodoroObserver)
     }
 
     private fun Pomodoro.toViewState(): ViewState {
