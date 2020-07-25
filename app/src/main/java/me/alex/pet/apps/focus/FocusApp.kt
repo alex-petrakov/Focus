@@ -5,6 +5,7 @@ import me.alex.pet.apps.focus.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class FocusApp : Application() {
 
@@ -15,6 +16,10 @@ class FocusApp : Application() {
             androidLogger()
             androidContext(this@FocusApp)
             modules(appModule)
+        }
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
     }
 }
