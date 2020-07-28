@@ -1,5 +1,6 @@
 package me.alex.pet.apps.focus.presentation.timer
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import me.alex.pet.apps.focus.common.extensions.observe
+import me.alex.pet.apps.focus.common.extensions.requireAppContext
 import me.alex.pet.apps.focus.databinding.FragmentTimerBinding
+import me.alex.pet.apps.focus.presentation.notificationservice.NotificationService
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TimerFragment : Fragment() {
@@ -29,7 +32,10 @@ class TimerFragment : Fragment() {
     }
 
     private fun subscribeToModel() {
-        model.viewState.observe(viewLifecycleOwner) { newState -> renderState(newState) }
+        model.apply {
+            viewState.observe(viewLifecycleOwner) { newState -> renderState(newState) }
+            viewEffect.observe(viewLifecycleOwner) { effect -> handleEffect(effect) }
+        }
     }
 
     override fun onStart() {
@@ -67,6 +73,19 @@ class TimerFragment : Fragment() {
             }
             workIntroLayout.root.isVisible = state.visiblePanel == ViewState.Panel.WORK_INTRO
             breakIntroLayout.root.isVisible = state.visiblePanel == ViewState.Panel.BREAK_INTRO
+        }
+    }
+
+    private fun handleEffect(effect: ViewEffect) {
+        when (effect) {
+            ViewEffect.START_NOTIFICATIONS -> startNotificationService()
+        }
+    }
+
+    private fun startNotificationService() {
+        requireAppContext().also { context ->
+            val intent = Intent(context, NotificationService::class.java)
+            context.startService(intent)
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.SingleLiveEvent
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.SessionType
 import me.alex.pet.apps.focus.domain.TimerState
@@ -19,6 +20,10 @@ class TimerModel(
 
     val viewState: LiveData<ViewState> get() = _viewState
 
+    private val _viewEffect = SingleLiveEvent<ViewEffect>()
+
+    val viewEffect: LiveData<ViewEffect> get() = _viewEffect
+
     private val pomodoroObserver = object : Pomodoro.Observer {
         override fun onUpdate() {
             _viewState.value = pomodoro.toViewState()
@@ -32,6 +37,7 @@ class TimerModel(
 
     fun onToggleTimer() {
         pomodoro.toggleSession()
+        _viewEffect.value = ViewEffect.START_NOTIFICATIONS
     }
 
     fun onReset() {
