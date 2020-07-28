@@ -8,7 +8,7 @@
         android:id="@+id/start_work_session_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_start_break_session"
+        android:text="@string/app_start_break"
         app:layout_constraintBottom_toTopOf="@+id/reset_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

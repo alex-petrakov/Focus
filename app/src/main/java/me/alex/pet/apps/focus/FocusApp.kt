@@ -2,6 +2,7 @@ package me.alex.pet.apps.focus
 
 import android.app.Application
 import me.alex.pet.apps.focus.di.appModule
+import me.alex.pet.apps.focus.presentation.notificationservice.Notifications
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -21,5 +22,7 @@ class FocusApp : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
+        Notifications(this).createNotificationChannels()
     }
 }

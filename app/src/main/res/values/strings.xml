@@ -1,14 +1,16 @@
 <resources>
     <string name="app_name">Focus</string>
 
+    <string name="empty" />
+
     <string name="app_action_start">Start</string>
     <string name="app_action_pause">Pause</string>
     <string name="app_action_resume">Resume</string>
     <string name="app_action_reset">Reset</string>
-    <string name="app_start_work_session">Start work session</string>
-
-    <string name="empty" />
-
+    <string name="app_start_work_session">Start focus session</string>
+    <string name="app_start_break">Start break</string>
     <string name="timer_completed_sessions_format">%1$d completed</string>
-    <string name="app_start_break_session">Start break session</string>
+
+    <string name="app_timer_notification_channel_name">Timer</string>
+    <string name="app_timer_notification_channel_description">Shows remaining pomodoro session time and provides timer controls while the timer is running.</string>
 </resources>
