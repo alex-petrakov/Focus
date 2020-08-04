@@ -39,10 +39,7 @@ class NotificationService : Service() {
             when (action) {
                 NotificationAction.PAUSE, NotificationAction.RESUME -> pomodoro.toggleSession()
                 NotificationAction.SWITCH_TO_NEXT_SESSION -> {
-                    pomodoro.apply {
-                        switchToNextSession()
-                        startSession()
-                    }
+                    pomodoro.startNextSession()
                 }
                 NotificationAction.RESET -> pomodoro.reset()
             }

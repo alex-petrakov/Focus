@@ -115,10 +115,11 @@ class Pomodoro constructor(
         }
     }
 
-    fun switchToNextSession() {
+    fun startNextSession() {
         check(isAwaitingSessionSwitch) { "currentSession isn't completed yet" }
         isAwaitingSessionSwitch = false
         changeSession(nextSessionType)
+        startSession()
     }
 
     private fun changeSession(nextSessionType: SessionType) {

@@ -45,10 +45,7 @@ class TimerModel(
     }
 
     fun onSwitchToNextSession() {
-        pomodoro.apply {
-            switchToNextSession()
-            startSession()
-        }
+        pomodoro.startNextSession()
     }
 
     override fun onCleared() {
