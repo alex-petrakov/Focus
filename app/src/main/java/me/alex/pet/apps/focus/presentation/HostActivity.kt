@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.databinding.ActivityHostBinding
+import me.alex.pet.apps.focus.presentation.settings.SettingsFragment
 import me.alex.pet.apps.focus.presentation.timer.TimerFragment
 
 class HostActivity : AppCompatActivity() {
@@ -20,5 +21,12 @@ class HostActivity : AppCompatActivity() {
                     .add(R.id.fragment_container, TimerFragment())
                     .commit()
         }
+    }
+
+    fun navigateToSettings() {
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, SettingsFragment())
+                .addToBackStack(null)
+                .commit()
     }
 }

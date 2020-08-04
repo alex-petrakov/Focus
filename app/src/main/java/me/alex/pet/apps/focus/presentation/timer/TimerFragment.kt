@@ -3,13 +3,16 @@ package me.alex.pet.apps.focus.presentation.timer
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.extensions.observe
 import me.alex.pet.apps.focus.common.extensions.requireAppContext
 import me.alex.pet.apps.focus.databinding.FragmentTimerBinding
+import me.alex.pet.apps.focus.presentation.HostActivity
 import me.alex.pet.apps.focus.presentation.notificationservice.NotificationService
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -28,6 +31,7 @@ class TimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.inflateMenu(R.menu.menu_timer)
         subscribeToModel()
     }
 
@@ -41,6 +45,7 @@ class TimerFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         binding.apply {
+            toolbar.setOnMenuItemClickListener(::handleMenuItemClick)
             timerLayout.apply {
                 toggleFab.setOnClickListener { model.onToggleTimer() }
                 resetBtn.setOnClickListener { model.onReset() }
@@ -53,6 +58,16 @@ class TimerFragment : Fragment() {
                 startWorkSessionBtn.setOnClickListener { model.onSwitchToNextSession() }
                 resetBtn.setOnClickListener { model.onReset() }
             }
+        }
+    }
+
+    private fun handleMenuItemClick(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+            R.id.action_open_settings -> {
+                (requireActivity() as HostActivity).navigateToSettings()
+                true
+            }
+            else -> false
         }
     }
 

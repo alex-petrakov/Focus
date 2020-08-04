@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="min_work_duration">15</integer>
+    <integer name="max_work_duration">90</integer>
+    <integer name="default_work_duration">25</integer>
+
+    <integer name="min_short_break_duration">1</integer>
+    <integer name="max_short_break_duration">30</integer>
+    <integer name="default_short_break_duration">5</integer>
+
+    <integer name="min_long_break_duration">1</integer>
+    <integer name="max_long_break_duration">30</integer>
+    <integer name="default_long_break_duration">10</integer>
+
+    <integer name="min_long_break_frequency">1</integer>
+    <integer name="max_long_break_frequency">10</integer>
+    <integer name="default_long_break_frequency">4</integer>
+</resources>
