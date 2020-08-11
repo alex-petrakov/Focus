@@ -52,6 +52,8 @@ class NotificationService : Service() {
 
     private val notifications = Notifications(this)
 
+    private var isRunning = false
+
     override fun onCreate() {
         Timber.d("onCreate()")
         val intentFilter = IntentFilter().apply {
@@ -66,8 +68,11 @@ class NotificationService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Timber.d("onStartCommand()")
-        startForeground(Notifications.TIMER_NOTIFICATION_ID, pomodoro.toNotification())
-        subscribeToModel()
+        if (!isRunning) {
+            startForeground(Notifications.TIMER_NOTIFICATION_ID, pomodoro.toNotification())
+            subscribeToModel()
+            isRunning = true
+        }
         return START_NOT_STICKY
     }
 
