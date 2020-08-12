@@ -1,12 +1,14 @@
 package me.alex.pet.apps.focus.domain
 
+import java.time.Duration
+
 interface PomodoroConfigurationRepository {
 
-    val workDurationMins: Int
+    val workDuration: Duration
 
-    val shortBreakDurationMins: Int
+    val shortBreakDuration: Duration
 
-    val longBreakDurationMins: Int
+    val longBreakDuration: Duration
 
     val longBreaksAreEnabled: Boolean
 
@@ -19,11 +21,11 @@ interface PomodoroConfigurationRepository {
     fun removePomodoroConfigurationObserver(observer: PomodoroConfigurationObserver)
 
     interface PomodoroConfigurationObserver {
-        fun onWorkDurationChange(workDurationMins: Int)
+        fun onWorkDurationChange(workDuration: Duration)
 
-        fun onShortBreakDurationChange(shortBreakDurationMins: Int)
+        fun onShortBreakDurationChange(shortBreakDuration: Duration)
 
-        fun onLongBreakDurationChange(longBreakDurationMins: Int)
+        fun onLongBreakDurationChange(longBreakDuration: Duration)
 
         fun onLongBreaksEnabled(longBreaksAreEnabled: Boolean)
 

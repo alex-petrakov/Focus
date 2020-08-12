@@ -20,7 +20,7 @@ class NotificationService : Service() {
 
     private val pomodoroObserver = object : Pomodoro.Observer {
         override fun onUpdate() {
-            Timber.d("onUpdate() ${pomodoro.remainingSeconds}")
+            Timber.d("onUpdate() ${pomodoro.remainingDuration}")
             if (pomodoro.isReset) {
                 stopForeground(true)
                 stopSelf()
@@ -99,7 +99,7 @@ class NotificationService : Service() {
                     notifications.newBreakIntroNotification()
                 }
             }
-            else -> notifications.newTimerNotification(sessionType, timerState, remainingSeconds)
+            else -> notifications.newTimerNotification(sessionType, timerState, remainingDuration.seconds)
         }
     }
 }

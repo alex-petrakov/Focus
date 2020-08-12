@@ -1,6 +1,7 @@
 package me.alex.pet.apps.focus.domain
 
 import me.alex.pet.apps.focus.domain.SessionType.*
+import java.time.Duration
 
 class Pomodoro constructor(
         private val clock: Clock,
@@ -43,25 +44,25 @@ class Pomodoro constructor(
         }
     }
 
-    private var session: Session = Session(clock, WORK, workDuration.toLong()).apply {
+    private var session: Session = Session(clock, WORK, workDuration).apply {
         addObserver(sessionObserver)
     }
 
     private val pomodoroConfigurationObserver = object : PomodoroConfigurationRepository.PomodoroConfigurationObserver {
-        override fun onWorkDurationChange(workDurationMins: Int) {
+        override fun onWorkDurationChange(workDuration: Duration) {
             // TODO: consider adding a check against invalid values
             if (session.timerState == TimerState.READY && session.type == WORK) {
                 changeSession(WORK)
             }
         }
 
-        override fun onShortBreakDurationChange(shortBreakDurationMins: Int) {
+        override fun onShortBreakDurationChange(shortBreakDuration: Duration) {
             if (session.timerState == TimerState.READY && session.type == SHORT_BREAK) {
                 changeSession(SHORT_BREAK)
             }
         }
 
-        override fun onLongBreakDurationChange(longBreakDurationMins: Int) {
+        override fun onLongBreakDurationChange(longBreakDuration: Duration) {
             if (session.timerState == TimerState.READY && session.type == LONG_BREAK) {
                 changeSession(LONG_BREAK)
             }
@@ -92,11 +93,11 @@ class Pomodoro constructor(
         fun onUpdate()
     }
 
-    val remainingSeconds: Long
-        get() = session.remainingSeconds
+    val remainingDuration: Duration
+        get() = session.remainingDuration
 
-    val passedSeconds: Long
-        get() = session.passedSeconds
+    val passedDuration: Duration
+        get() = session.passedDuration
 
     val sessionType: SessionType
         get() = session.type
@@ -113,14 +114,14 @@ class Pomodoro constructor(
     private val nextSessionIsLongBreak
         get() = longBreaksAreEnabled && (completedWorkSessionCount % (numberOfSessionsBetweenLongBreaks + 1) == 0)
 
-    val workDuration: Seconds
-        get() = configurationRepository.workDurationMins
+    val workDuration: Duration
+        get() = configurationRepository.workDuration
 
-    val shortBreakDuration: Seconds
-        get() = configurationRepository.shortBreakDurationMins
+    val shortBreakDuration: Duration
+        get() = configurationRepository.shortBreakDuration
 
-    val longBreakDuration: Seconds
-        get() = configurationRepository.longBreakDurationMins
+    val longBreakDuration: Duration
+        get() = configurationRepository.longBreakDuration
 
     val longBreaksAreEnabled: Boolean
         get() = configurationRepository.longBreaksAreEnabled
@@ -169,9 +170,9 @@ class Pomodoro constructor(
 
     private fun changeSession(nextSessionType: SessionType) {
         val nextSession = when (nextSessionType) {
-            WORK -> Session(clock, WORK, workDuration.toLong())
-            SHORT_BREAK -> Session(clock, SHORT_BREAK, shortBreakDuration.toLong())
-            LONG_BREAK -> Session(clock, LONG_BREAK, longBreakDuration.toLong())
+            WORK -> Session(clock, WORK, workDuration)
+            SHORT_BREAK -> Session(clock, SHORT_BREAK, shortBreakDuration)
+            LONG_BREAK -> Session(clock, LONG_BREAK, longBreakDuration)
         }
         session.removeObserver(sessionObserver)
         session = nextSession.apply {
@@ -210,6 +211,3 @@ class Pomodoro constructor(
         const val DEFAULT_LONG_BREAK_FREQUENCY = 4
     }
 }
-
-
-typealias Seconds = Int

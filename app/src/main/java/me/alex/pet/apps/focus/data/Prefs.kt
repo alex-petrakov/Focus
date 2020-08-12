@@ -8,6 +8,7 @@ import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.PomodoroConfigurationRepository
 import me.alex.pet.apps.focus.domain.PomodoroConfigurationRepository.PomodoroConfigurationObserver
 import timber.log.Timber
+import java.time.Duration
 
 class Prefs(context: Context) : KotprefModel(context), PomodoroConfigurationRepository {
 
@@ -20,11 +21,26 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroConfigurationRepo
     private val longBreakFrequencyKey = context.getString(R.string.pref_long_break_frequency)
     private val sessionAutoSwitchKey = context.getString(R.string.pref_auto_session_switch_is_on)
 
-    override var workDurationMins by intPref(default = Pomodoro.DEFAULT_WORK_DURATION_MINUTES, key = workDurationKey)
+    override var workDuration: Duration
+        get() = Duration.ofMinutes(_workDurationInMinutes.toLong())
+        set(value) {
+            _workDurationInMinutes = value.toMinutes().clampToInt()
+        }
+    private var _workDurationInMinutes by intPref(default = Pomodoro.DEFAULT_WORK_DURATION_MINUTES, key = workDurationKey)
 
-    override var shortBreakDurationMins by intPref(default = Pomodoro.DEFAULT_SHORT_BREAK_DURATION, key = shortBreakDurationKey)
+    override var shortBreakDuration: Duration
+        get() = Duration.ofMinutes(_shortBreakDurationInMinutes.toLong())
+        set(value) {
+            _workDurationInMinutes = value.toMinutes().clampToInt()
+        }
+    private var _shortBreakDurationInMinutes by intPref(default = Pomodoro.DEFAULT_SHORT_BREAK_DURATION, key = shortBreakDurationKey)
 
-    override var longBreakDurationMins by intPref(default = Pomodoro.DEFAULT_LONG_BREAK_DURATION, key = longBreakDurationKey)
+    override var longBreakDuration: Duration
+        get() = Duration.ofMinutes(_longBreakDurationInMinutes.toLong())
+        set(value) {
+            _longBreakDurationInMinutes = value.toMinutes().clampToInt()
+        }
+    private var _longBreakDurationInMinutes by intPref(default = Pomodoro.DEFAULT_LONG_BREAK_DURATION, key = longBreakDurationKey)
 
     override var longBreaksAreEnabled by booleanPref(default = true, key = longBreakAreEnabledKey)
 
@@ -73,17 +89,17 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroConfigurationRepo
     }
 
     private fun notifyAboutWorkDurationChange() {
-        val duration = workDurationMins
+        val duration = workDuration
         observers.forEach { it.onWorkDurationChange(duration) }
     }
 
     private fun notifyAboutShortBreakDurationChange() {
-        val duration = shortBreakDurationMins
+        val duration = shortBreakDuration
         observers.forEach { it.onShortBreakDurationChange(duration) }
     }
 
     private fun notifyAboutLongBreakDurationChange() {
-        val duration = longBreakDurationMins
+        val duration = longBreakDuration
         observers.forEach { it.onLongBreakDurationChange(duration) }
     }
 
@@ -100,5 +116,13 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroConfigurationRepo
     private fun notifyAboutAutoSessionSwitchOnOff() {
         val autoSessionSwitchIsEnabled = autoSessionSwitchIsEnabled
         observers.forEach { it.onAutoSessionSwitchEnabled(autoSessionSwitchIsEnabled) }
+    }
+
+    private fun Long.clampToInt(): Int {
+        return when {
+            this > Int.MAX_VALUE -> Int.MAX_VALUE
+            this < Int.MIN_VALUE -> Int.MIN_VALUE
+            else -> toInt()
+        }
     }
 }

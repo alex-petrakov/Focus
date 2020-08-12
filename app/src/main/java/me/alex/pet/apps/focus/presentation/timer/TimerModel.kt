@@ -75,7 +75,7 @@ class TimerModel(
 
     private fun Pomodoro.toTimerViewState(): ViewState.Timer {
         return ViewState.Timer(
-                remainingSeconds.toString(),
+                remainingDuration.seconds.toString(),
                 timerState == TimerState.PAUSED
         )
     }
@@ -83,7 +83,7 @@ class TimerModel(
     private fun Pomodoro.toProgressViewState(): ViewState.Progress {
         return ViewState.Progress(
                 sessionIsActive,
-                (passedSeconds * 100.0 / workDuration).roundToInt(),
+                (passedDuration.seconds * 100.0 / workDuration.seconds).roundToInt(),
                 0
         )
     }

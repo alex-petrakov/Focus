@@ -1,15 +1,15 @@
 package me.alex.pet.apps.focus.domain
 
-import java.util.concurrent.TimeUnit.MILLISECONDS
-import java.util.concurrent.TimeUnit.SECONDS
+import me.alex.pet.apps.focus.common.extensions.isPositive
+import java.time.Duration
 
 class Session(
         private val clock: Clock,
         val type: SessionType,
-        durationSeconds: Long
+        duration: Duration
 ) {
 
-    private val durationMillis: Long = SECONDS.toMillis(durationSeconds)
+    private val durationMillis: Long = duration.toMillis()
 
     private val clockObserver = object : Clock.Observer {
         override fun onTick(elapsedRealtime: Long) {
@@ -36,11 +36,11 @@ class Session(
     var timerState: TimerState = TimerState.READY
         private set
 
-    val remainingSeconds: Long
-        get() = MILLISECONDS.toSeconds(remainingMillis)
+    val remainingDuration: Duration
+        get() = Duration.ofMillis(remainingMillis)
 
-    val passedSeconds: Long
-        get() = MILLISECONDS.toSeconds(durationMillis - remainingMillis)
+    val passedDuration: Duration
+        get() = Duration.ofMillis(durationMillis - remainingMillis)
 
     private var observers = mutableListOf<Observer>()
 
@@ -54,7 +54,7 @@ class Session(
     }
 
     init {
-        require(durationSeconds > 0) { "Session duration can't be negative" }
+        require(duration.isPositive) { "Session duration can't be negative" }
     }
 
     fun start(): Session {
