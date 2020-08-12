@@ -1,36 +1,48 @@
 package me.alex.pet.apps.focus.domain
 
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
-import android.os.SystemClock
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
 class Session(
+        private val clock: Clock,
         val type: SessionType,
         durationSeconds: Long
 ) {
 
     private val durationMillis: Long = SECONDS.toMillis(durationSeconds)
 
-    private val countdownIntervalMillis: Long = SECONDS.toMillis(1)
+    private val clockObserver = object : Clock.Observer {
+        override fun onTick(elapsedRealtime: Long) {
+            if (timerState != TimerState.RUNNING) {
+                return
+            }
+            val leftDuration = stopTimeInFuture - elapsedRealtime
+            remainingMillis = leftDuration
+            if (leftDuration <= 0) {
+                timerState = TimerState.FINISHED
+                clock.stop()
+                clock.removeObserver(this)
+                observers.forEach { it.onFinish() }
+            } else {
+                observers.forEach { it.onTick() }
+            }
+        }
+    }
 
     private var stopTimeInFuture: Long = 0
 
     private var remainingMillis: Long = durationMillis
 
     var timerState: TimerState = TimerState.READY
-        @Synchronized get
         private set
 
     val remainingSeconds: Long
-        @Synchronized get() = MILLISECONDS.toSeconds(remainingMillis)
+        get() = MILLISECONDS.toSeconds(remainingMillis)
 
     val passedSeconds: Long
-        @Synchronized get() = MILLISECONDS.toSeconds(durationMillis - remainingMillis)
+        get() = MILLISECONDS.toSeconds(durationMillis - remainingMillis)
 
-    private val observers = mutableListOf<Observer>()
+    private var observers = mutableListOf<Observer>()
 
     interface Observer {
         fun onStart()
@@ -41,96 +53,58 @@ class Session(
         fun onCancel()
     }
 
-    @Synchronized
+    init {
+        require(durationSeconds > 0) { "Session duration can't be negative" }
+    }
+
     fun start(): Session {
-        check(timerState == TimerState.READY) { "A session can be started only once." }
+        check(timerState == TimerState.READY) { "A session can be started only once" }
         timerState = TimerState.RUNNING
-        if (durationMillis <= 0) {
-            timerState = TimerState.FINISHED
-            observers.forEach { it.onFinish() }
-            return this
-        }
         observers.forEach { observer ->
             observer.onStart()
             observer.onResume()
         }
-        stopTimeInFuture = SystemClock.elapsedRealtime() + durationMillis
-        handler.sendMessage(handler.obtainMessage(HANDLER_MSG))
+        stopTimeInFuture = clock.now() + durationMillis
+        clock.addObserver(clockObserver)
+        clock.start()
         return this
     }
 
-    @Synchronized
     fun pause() {
         if (timerState != TimerState.RUNNING) {
             return
         }
         timerState = TimerState.PAUSED
-        handler.removeMessages(HANDLER_MSG)
+        clock.stop()
         observers.forEach { it.onPause() }
     }
 
-    @Synchronized
     fun resume() {
         if (timerState != TimerState.PAUSED) {
             return
         }
         timerState = TimerState.RUNNING
         observers.forEach { it.onResume() }
-        stopTimeInFuture = SystemClock.elapsedRealtime() + remainingMillis
-        handler.sendMessage(handler.obtainMessage(HANDLER_MSG))
+        stopTimeInFuture = clock.now() + remainingMillis
+        clock.start()
     }
 
-    @Synchronized
     fun cancel() {
         timerState = TimerState.CANCELLED
-        handler.removeMessages(HANDLER_MSG)
+        clock.stop()
+        clock.removeObserver(clockObserver)
         observers.forEach { it.onCancel() }
     }
 
-    @Synchronized
     fun addObserver(observer: Observer) {
-        observers.add(observer)
+        observers = observers.toMutableList().apply {
+            add(observer)
+        }
     }
 
-    @Synchronized
     fun removeObserver(observer: Observer) {
-        observers.remove(observer)
-    }
-
-    private val handler: Handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            synchronized(this@Session) {
-                if (timerState != TimerState.RUNNING) {
-                    return
-                }
-                val millisLeft = stopTimeInFuture - SystemClock.elapsedRealtime()
-                remainingMillis = millisLeft
-                if (millisLeft <= 0) {
-                    timerState = TimerState.FINISHED
-                    observers.forEach { it.onFinish() }
-                } else {
-                    val lastTickStart = SystemClock.elapsedRealtime()
-                    observers.forEach { it.onTick() }
-                    // Take into account user's onTick taking time to execute
-                    val lastTickDuration = SystemClock.elapsedRealtime() - lastTickStart
-                    var delay: Long
-                    if (millisLeft < countdownIntervalMillis) {
-                        // Just delay until done
-                        delay = millisLeft - lastTickDuration
-                        // Special case: user's onTick took more than interval to
-                        // Complete, trigger onFinish without delay
-                        if (delay < 0) delay = 0
-                    } else {
-                        delay = countdownIntervalMillis - lastTickDuration
-                        // Special case: user's onTick took more than interval to
-                        // Complete, skip to next interval
-                        while (delay < 0) delay += countdownIntervalMillis
-                    }
-                    sendMessageDelayed(obtainMessage(HANDLER_MSG), delay)
-                }
-            }
+        observers = observers.toMutableList().apply {
+            remove(observer)
         }
     }
 }
-
-private const val HANDLER_MSG = 1

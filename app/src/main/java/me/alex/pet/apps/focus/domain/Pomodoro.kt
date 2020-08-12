@@ -3,6 +3,7 @@ package me.alex.pet.apps.focus.domain
 import me.alex.pet.apps.focus.domain.SessionType.*
 
 class Pomodoro constructor(
+        private val clock: Clock,
         private val configurationRepository: PomodoroConfigurationRepository
 ) {
     private val sessionObserver = object : Session.Observer {
@@ -42,7 +43,7 @@ class Pomodoro constructor(
         }
     }
 
-    private var session: Session = Session(WORK, workDuration.toLong()).apply {
+    private var session: Session = Session(clock, WORK, workDuration.toLong()).apply {
         addObserver(sessionObserver)
     }
 
@@ -168,9 +169,9 @@ class Pomodoro constructor(
 
     private fun changeSession(nextSessionType: SessionType) {
         val nextSession = when (nextSessionType) {
-            WORK -> Session(WORK, workDuration.toLong())
-            SHORT_BREAK -> Session(SHORT_BREAK, shortBreakDuration.toLong())
-            LONG_BREAK -> Session(LONG_BREAK, longBreakDuration.toLong())
+            WORK -> Session(clock, WORK, workDuration.toLong())
+            SHORT_BREAK -> Session(clock, SHORT_BREAK, shortBreakDuration.toLong())
+            LONG_BREAK -> Session(clock, LONG_BREAK, longBreakDuration.toLong())
         }
         session.removeObserver(sessionObserver)
         session = nextSession.apply {
