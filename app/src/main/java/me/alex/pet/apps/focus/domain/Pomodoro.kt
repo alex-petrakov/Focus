@@ -86,7 +86,7 @@ class Pomodoro constructor(
     var isAwaitingSessionSwitch = false
         private set
 
-    private val observers = mutableListOf<Observer>()
+    private var observers = mutableListOf<Observer>()
 
     interface Observer {
         fun onUpdate()
@@ -188,11 +188,15 @@ class Pomodoro constructor(
     }
 
     fun addObserver(observer: Observer) {
-        observers.add(observer)
+        observers = observers.toMutableList().apply {
+            add(observer)
+        }
     }
 
     fun removeObserver(observer: Observer) {
-        observers.remove(observer)
+        observers = observers.toMutableList().apply {
+            remove(observer)
+        }
     }
 
     private fun notifyObservers() {

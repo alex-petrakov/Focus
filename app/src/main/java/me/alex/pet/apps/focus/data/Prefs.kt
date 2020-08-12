@@ -52,17 +52,21 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroConfigurationRepo
         }
     }
 
-    private val observers = mutableListOf<PomodoroConfigurationObserver>()
+    private var observers = mutableListOf<PomodoroConfigurationObserver>()
 
     override fun addPomodoroConfigurationObserver(observer: PomodoroConfigurationObserver) {
         if (observers.isEmpty()) {
             preferences.registerOnSharedPreferenceChangeListener(prefsListener)
         }
-        observers.add(observer)
+        observers = observers.toMutableList().apply {
+            add(observer)
+        }
     }
 
     override fun removePomodoroConfigurationObserver(observer: PomodoroConfigurationObserver) {
-        observers.remove(observer)
+        observers = observers.toMutableList().apply {
+            remove(observer)
+        }
         if (observers.isEmpty()) {
             preferences.unregisterOnSharedPreferenceChangeListener(prefsListener)
         }
