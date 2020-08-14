@@ -1,6 +1,7 @@
 package me.alex.pet.apps.focus.domain
 
 import me.alex.pet.apps.focus.common.extensions.minutes
+import me.alex.pet.apps.focus.domain.Session.TimerState
 import org.assertj.core.api.AbstractObjectAssert
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -146,10 +147,10 @@ class SessionTest {
 
     private fun createSession(
             clock: Clock = this.clock,
-            sessionType: SessionType = SessionType.WORK,
+            type: Session.Type = Session.Type.WORK,
             duration: Duration = 10.minutes
     ): Session {
-        return Session(clock, sessionType, duration)
+        return Session(clock, type, duration)
     }
 
     class StubClock : Clock {

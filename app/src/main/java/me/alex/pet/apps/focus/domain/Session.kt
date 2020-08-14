@@ -5,7 +5,7 @@ import java.time.Duration
 
 class Session(
         private val clock: Clock,
-        val type: SessionType,
+        val type: Type,
         duration: Duration
 ) {
 
@@ -106,5 +106,20 @@ class Session(
         observers = observers.toMutableList().apply {
             remove(observer)
         }
+    }
+
+
+    enum class Type {
+        WORK,
+        SHORT_BREAK,
+        LONG_BREAK
+    }
+
+    enum class TimerState {
+        READY,
+        RUNNING,
+        PAUSED,
+        FINISHED,
+        CANCELLED
     }
 }

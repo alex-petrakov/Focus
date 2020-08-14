@@ -9,8 +9,7 @@ import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.app.NotificationManagerCompat
 import me.alex.pet.apps.focus.domain.Pomodoro
-import me.alex.pet.apps.focus.domain.SessionType
-import me.alex.pet.apps.focus.domain.TimerState
+import me.alex.pet.apps.focus.domain.Session
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -30,7 +29,7 @@ class NotificationService : Service() {
         }
     }
 
-    private val Pomodoro.isReset get() = timerState == TimerState.READY && completedWorkSessionCount == 0
+    private val Pomodoro.isReset get() = timerState == Session.TimerState.READY && completedWorkSessionCount == 0
 
     private val notificationActionsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -93,7 +92,7 @@ class NotificationService : Service() {
     private fun Pomodoro.toNotification(): Notification {
         return when {
             isAwaitingSessionSwitch -> {
-                if (nextSessionType == SessionType.WORK) {
+                if (nextSessionType == Session.Type.WORK) {
                     notifications.newWorkIntroNotification()
                 } else {
                     notifications.newBreakIntroNotification()

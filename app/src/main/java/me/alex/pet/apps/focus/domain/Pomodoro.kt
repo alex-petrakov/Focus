@@ -1,6 +1,8 @@
 package me.alex.pet.apps.focus.domain
 
-import me.alex.pet.apps.focus.domain.SessionType.*
+import me.alex.pet.apps.focus.domain.Session.TimerState
+import me.alex.pet.apps.focus.domain.Session.Type
+import me.alex.pet.apps.focus.domain.Session.Type.*
 import java.time.Duration
 
 class Pomodoro constructor(
@@ -99,7 +101,7 @@ class Pomodoro constructor(
     val passedDuration: Duration
         get() = session.passedDuration
 
-    val sessionType: SessionType
+    val sessionType: Type
         get() = session.type
 
     val timerState: TimerState
@@ -168,7 +170,7 @@ class Pomodoro constructor(
         startSession()
     }
 
-    private fun changeSession(nextSessionType: SessionType) {
+    private fun changeSession(nextSessionType: Type) {
         val nextSession = when (nextSessionType) {
             WORK -> Session(clock, WORK, workDuration)
             SHORT_BREAK -> Session(clock, SHORT_BREAK, shortBreakDuration)

@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.SingleLiveEvent
 import me.alex.pet.apps.focus.domain.Pomodoro
-import me.alex.pet.apps.focus.domain.SessionType
-import me.alex.pet.apps.focus.domain.TimerState
+import me.alex.pet.apps.focus.domain.Session
+import me.alex.pet.apps.focus.domain.Session.TimerState
 import kotlin.math.roundToInt
 
 class TimerModel(
@@ -55,7 +55,7 @@ class TimerModel(
     private fun Pomodoro.toViewState(): ViewState {
         val resetBtnIsVisible = timerState == TimerState.PAUSED
         val visiblePanel = if (isAwaitingSessionSwitch) {
-            if (nextSessionType == SessionType.WORK) {
+            if (nextSessionType == Session.Type.WORK) {
                 ViewState.Panel.WORK_INTRO
             } else {
                 ViewState.Panel.BREAK_INTRO
