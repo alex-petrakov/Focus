@@ -42,6 +42,9 @@ class Session(
     val passedDuration: Duration
         get() = Duration.ofMillis(durationMillis - remainingMillis)
 
+    val progress: Double
+        get() = passedDuration.toMillis() * 100.0 / durationMillis
+
     private var observers = mutableListOf<Observer>()
 
     interface Observer {
