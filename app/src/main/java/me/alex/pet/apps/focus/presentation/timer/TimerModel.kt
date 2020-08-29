@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.SingleLiveEvent
 import me.alex.pet.apps.focus.domain.Pomodoro
-import me.alex.pet.apps.focus.domain.Session
-import me.alex.pet.apps.focus.domain.Session.TimerState
+import me.alex.pet.apps.focus.domain.SessionType
+import me.alex.pet.apps.focus.domain.Timer.State
 import kotlin.math.roundToInt
 
 class TimerModel(
@@ -53,9 +53,9 @@ class TimerModel(
     }
 
     private fun Pomodoro.toViewState(): ViewState {
-        val resetBtnIsVisible = timerState == TimerState.PAUSED
+        val resetBtnIsVisible = timerState == State.PAUSED
         val visiblePanel = if (isAwaitingSessionSwitch) {
-            if (nextSessionType == Session.Type.WORK) {
+            if (nextSessionType == SessionType.WORK) {
                 ViewState.Panel.WORK_INTRO
             } else {
                 ViewState.Panel.BREAK_INTRO
@@ -76,7 +76,7 @@ class TimerModel(
     private fun Pomodoro.toTimerViewState(): ViewState.Timer {
         return ViewState.Timer(
                 remainingDuration.seconds.toString(),
-                timerState == TimerState.PAUSED
+                timerState == State.PAUSED
         )
     }
 
@@ -97,21 +97,21 @@ class TimerModel(
 
     private fun Pomodoro.toToggleViewState(): ViewState.Toggle {
         val iconId = when (timerState) {
-            TimerState.RUNNING -> R.drawable.ic_action_pause
+            State.RUNNING -> R.drawable.ic_action_pause
             else -> R.drawable.ic_action_start
         }
         val isVisible = when (timerState) {
-            TimerState.READY, TimerState.RUNNING, TimerState.PAUSED -> true
+            State.READY, State.RUNNING, State.PAUSED -> true
             else -> false
         }
         val strId = when (timerState) {
-            TimerState.READY -> R.string.app_action_start
-            TimerState.RUNNING -> R.string.app_action_pause
-            TimerState.PAUSED -> R.string.app_action_resume
+            State.READY -> R.string.app_action_start
+            State.RUNNING -> R.string.app_action_pause
+            State.PAUSED -> R.string.app_action_resume
             else -> R.string.empty
         }
         return ViewState.Toggle(isVisible, app.getString(strId), app.getDrawable(iconId)!!)
     }
 
-    private val Pomodoro.sessionIsActive get() = (timerState == TimerState.RUNNING || timerState == TimerState.PAUSED)
+    private val Pomodoro.sessionIsActive get() = (timerState == State.RUNNING || timerState == State.PAUSED)
 }

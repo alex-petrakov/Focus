@@ -1,25 +1,27 @@
 package me.alex.pet.apps.focus.domain
 
 import me.alex.pet.apps.focus.common.extensions.isPositive
+import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
 
-class Session(
+class SessionTimer(
         private val clock: Clock,
-        val type: Type,
         duration: Duration
-) {
+) : Timer {
 
-    private val durationMillis: Long = duration.toMillis()
+    private var durationMillis: Long = duration.toMillis()
+
+    private var remainingMillis: Long = durationMillis
 
     private val clockObserver = object : Clock.Observer {
         override fun onTick(elapsedRealtime: Long) {
-            if (timerState != TimerState.RUNNING) {
+            if (state != State.RUNNING) {
                 return
             }
             val leftDuration = stopTimeInFuture - elapsedRealtime
             remainingMillis = leftDuration
             if (leftDuration <= 0) {
-                timerState = TimerState.FINISHED
+                state = State.FINISHED
                 clock.stop()
                 clock.removeObserver(this)
                 observers.forEach { it.onFinish() }
@@ -31,38 +33,27 @@ class Session(
 
     private var stopTimeInFuture: Long = 0
 
-    private var remainingMillis: Long = durationMillis
-
-    var timerState: TimerState = TimerState.READY
+    override var state: State = State.READY
         private set
 
-    val remainingDuration: Duration
+    override val remainingDuration: Duration
         get() = Duration.ofMillis(remainingMillis)
 
-    val passedDuration: Duration
+    override val passedDuration: Duration
         get() = Duration.ofMillis(durationMillis - remainingMillis)
 
-    val progress: Double
+    override val progress: Double
         get() = passedDuration.toMillis() * 100.0 / durationMillis
 
-    private var observers = mutableListOf<Observer>()
-
-    interface Observer {
-        fun onStart()
-        fun onResume()
-        fun onPause()
-        fun onTick()
-        fun onFinish()
-        fun onCancel()
-    }
+    private var observers = mutableListOf<Timer.Observer>()
 
     init {
-        require(duration.isPositive) { "Session duration can't be negative" }
+        require(duration.isPositive) { "Timer duration can't be negative" }
     }
 
-    fun start(): Session {
-        check(timerState == TimerState.READY) { "A session can be started only once" }
-        timerState = TimerState.RUNNING
+    override fun start() {
+        check(state == State.READY) { "This timer is not in a ${State.READY} state" }
+        state = State.RUNNING
         observers.forEach { observer ->
             observer.onStart()
             observer.onResume()
@@ -70,59 +61,52 @@ class Session(
         stopTimeInFuture = clock.now() + durationMillis
         clock.addObserver(clockObserver)
         clock.start()
-        return this
     }
 
-    fun pause() {
-        if (timerState != TimerState.RUNNING) {
+    override fun pause() {
+        if (state != State.RUNNING) {
             return
         }
-        timerState = TimerState.PAUSED
+        state = State.PAUSED
         clock.stop()
         observers.forEach { it.onPause() }
     }
 
-    fun resume() {
-        if (timerState != TimerState.PAUSED) {
+    override fun resume() {
+        if (state != State.PAUSED) {
             return
         }
-        timerState = TimerState.RUNNING
+        state = State.RUNNING
         observers.forEach { it.onResume() }
         stopTimeInFuture = clock.now() + remainingMillis
         clock.start()
     }
 
-    fun cancel() {
-        timerState = TimerState.CANCELLED
+    override fun cancel() {
+        state = State.CANCELLED
         clock.stop()
         clock.removeObserver(clockObserver)
         observers.forEach { it.onCancel() }
     }
 
-    fun addObserver(observer: Observer) {
+    override fun reset(duration: Duration) {
+        state = State.READY
+        durationMillis = duration.toMillis()
+        remainingMillis = durationMillis
+        clock.stop()
+        clock.removeObserver(clockObserver)
+        observers.forEach { it.onReset() }
+    }
+
+    override fun addObserver(observer: Timer.Observer) {
         observers = observers.toMutableList().apply {
             add(observer)
         }
     }
 
-    fun removeObserver(observer: Observer) {
+    override fun removeObserver(observer: Timer.Observer) {
         observers = observers.toMutableList().apply {
             remove(observer)
         }
-    }
-
-
-    enum class Type {
-        WORK,
-        SHORT_BREAK,
-        LONG_BREAK
-    }
-
-    enum class TimerState {
-        READY,
-        RUNNING,
-        PAUSED,
-        FINISHED,
-        CANCELLED
     }
 }

@@ -1,15 +1,14 @@
 package me.alex.pet.apps.focus.domain
 
-import me.alex.pet.apps.focus.domain.Session.TimerState
-import me.alex.pet.apps.focus.domain.Session.Type
-import me.alex.pet.apps.focus.domain.Session.Type.*
+import me.alex.pet.apps.focus.domain.SessionType.*
+import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
 
 class Pomodoro constructor(
-        private val clock: Clock,
+        private val timer: Timer,
         settingsRepository: PomodoroSettingsRepository
 ) {
-    private val sessionObserver = object : Session.Observer {
+    private val timerObserver = object : Timer.Observer {
         override fun onStart() {
             notifyObservers()
         }
@@ -27,7 +26,7 @@ class Pomodoro constructor(
         }
 
         override fun onFinish() {
-            if (session.type == WORK) {
+            if (currentSessionType == WORK) {
                 completedWorkSessionCount++
             }
             notifyObservers()
@@ -44,21 +43,23 @@ class Pomodoro constructor(
         override fun onCancel() {
             notifyObservers()
         }
+
+        override fun onReset() {
+            notifyObservers()
+        }
     }
 
     private var currentSettings: Settings = settingsRepository.settings
 
     private var updatedSettings: Settings = currentSettings
 
-    private var session: Session = Session(clock, WORK, currentSettings.workDuration).apply {
-        addObserver(sessionObserver)
-    }
+    private var currentSessionType: SessionType = WORK
 
     private val settingsObserver = object : PomodoroSettingsRepository.Observer {
         override fun onSettingsChange(settings: Settings) {
             updatedSettings = settings
-            if (session.timerState == TimerState.READY) {
-                changeSession(session.type)
+            if (timer.state == State.READY) {
+                changeSession(currentSessionType)
             }
         }
     }
@@ -76,22 +77,22 @@ class Pomodoro constructor(
     }
 
     val remainingDuration: Duration
-        get() = session.remainingDuration
+        get() = timer.remainingDuration
 
     val passedDuration: Duration
-        get() = session.passedDuration
+        get() = timer.passedDuration
 
     val progress: Double
-        get() = session.progress
+        get() = timer.progress
 
-    val sessionType: Type
-        get() = session.type
+    val sessionType: SessionType
+        get() = currentSessionType
 
-    val timerState: TimerState
-        get() = session.timerState
+    val timerState: State
+        get() = timer.state
 
     val nextSessionType
-        get() = when (session.type) {
+        get() = when (currentSessionType) {
             WORK -> if (nextSessionIsLongBreak) LONG_BREAK else SHORT_BREAK
             SHORT_BREAK, LONG_BREAK -> WORK
         }
@@ -106,28 +107,31 @@ class Pomodoro constructor(
     init {
         // TODO: unregister the observer
         settingsRepository.addObserver(settingsObserver)
+        timer.reset(duration = currentSettings.workDuration)
+        timer.addObserver(timerObserver)
+        currentSessionType = WORK
     }
 
     fun startSession() {
-        check(session.timerState == TimerState.READY) { "Only a session in the '${TimerState.READY}' state can be started" }
-        session.start()
+        check(timer.state == State.READY) { "Only a session in the '${State.READY}' state can be started" }
+        timer.start()
     }
 
     fun pauseSession() {
-        check(session.timerState == TimerState.RUNNING) { "Only a session in the '${TimerState.RUNNING}' state can be paused" }
-        session.pause()
+        check(timer.state == State.RUNNING) { "Only a session in the '${State.RUNNING}' state can be paused" }
+        timer.pause()
     }
 
     fun resumeSession() {
-        check(session.timerState == TimerState.PAUSED) { "Only a session in the '${TimerState.PAUSED}' state can be resumed" }
-        session.resume()
+        check(timer.state == State.PAUSED) { "Only a session in the '${State.PAUSED}' state can be resumed" }
+        timer.resume()
     }
 
     fun toggleSession() {
-        when (session.timerState) {
-            TimerState.READY -> session.start()
-            TimerState.RUNNING -> session.pause()
-            TimerState.PAUSED -> session.resume()
+        when (timer.state) {
+            State.READY -> timer.start()
+            State.RUNNING -> timer.pause()
+            State.PAUSED -> timer.resume()
             else -> throw IllegalStateException("Finished or cancelled session can't be toggled")
         }
     }
@@ -139,22 +143,22 @@ class Pomodoro constructor(
         startSession()
     }
 
-    private fun changeSession(nextSessionType: Type) {
+    private fun changeSession(nextSessionType: SessionType) {
         currentSettings = updatedSettings
-        val nextSession = when (nextSessionType) {
-            WORK -> Session(clock, WORK, currentSettings.workDuration)
-            SHORT_BREAK -> Session(clock, SHORT_BREAK, currentSettings.shortBreakDuration)
-            LONG_BREAK -> Session(clock, LONG_BREAK, currentSettings.longBreakDuration)
+
+        val sessionDuration = when (nextSessionType) {
+            WORK -> currentSettings.workDuration
+            SHORT_BREAK -> currentSettings.shortBreakDuration
+            LONG_BREAK -> currentSettings.longBreakDuration
         }
-        session.removeObserver(sessionObserver)
-        session = nextSession.apply {
-            addObserver(sessionObserver)
-        }
+        currentSessionType = nextSessionType
+        timer.reset(duration = sessionDuration)
+
         notifyObservers()
     }
 
     fun reset() {
-        session.cancel()
+        timer.cancel()
         completedWorkSessionCount = 0
         isAwaitingSessionSwitch = false
         changeSession(WORK)

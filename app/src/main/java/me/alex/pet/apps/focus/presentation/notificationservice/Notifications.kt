@@ -10,7 +10,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import me.alex.pet.apps.focus.R
-import me.alex.pet.apps.focus.domain.Session
+import me.alex.pet.apps.focus.domain.SessionType
+import me.alex.pet.apps.focus.domain.Timer
 import me.alex.pet.apps.focus.presentation.HostActivity
 
 
@@ -56,18 +57,18 @@ class Notifications(private val context: Context) {
                 .build()
     }
 
-    fun newTimerNotification(type: Session.Type, timerState: Session.TimerState, remainingSeconds: Long): Notification {
+    fun newTimerNotification(type: SessionType, timerState: Timer.State, remainingSeconds: Long): Notification {
         val pauseAction = newAction(NotificationAction.PAUSE, R.drawable.ic_action_pause, context.getString(R.string.app_action_pause))
         val resumeAction = newAction(NotificationAction.RESUME, R.drawable.ic_action_start, context.getString(R.string.app_action_resume))
         val resetAction = newAction(NotificationAction.RESET, R.drawable.ic_action_reset, context.getString(R.string.app_action_reset))
         return newPomodoroNotificationBuilder().apply {
             when (timerState) {
-                Session.TimerState.RUNNING -> {
+                Timer.State.RUNNING -> {
                     setContentTitle(remainingSeconds.toString())
                     setContentText(type.toString())
                     addAction(pauseAction)
                 }
-                Session.TimerState.PAUSED -> {
+                Timer.State.PAUSED -> {
                     setContentTitle("$remainingSeconds (paused)")
                     setContentText(type.toString())
                     addAction(resumeAction)
