@@ -6,17 +6,15 @@ interface PomodoroSettingsRepository {
 
     val settings: Pomodoro.Settings
 
-    val workDuration: Duration
+    var workDuration: Duration
 
-    val shortBreakDuration: Duration
+    var shortBreakDuration: Duration
 
-    val longBreakDuration: Duration
+    var longBreakDuration: Duration
 
-    val longBreaksAreEnabled: Boolean
+    var longBreaksAreEnabled: Boolean
 
-    val numberOfSessionsBetweenLongBreaks: Int
-
-    val autoSessionSwitchIsEnabled: Boolean
+    var numberOfSessionsBetweenLongBreaks: Int
 
     fun addObserver(observer: Observer)
 

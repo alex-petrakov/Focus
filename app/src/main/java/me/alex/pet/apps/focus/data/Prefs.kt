@@ -19,15 +19,13 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroSettingsRepositor
     private val longBreakDurationKey = context.getString(R.string.pref_long_break_duration)
     private val longBreaksAreEnabledKey = context.getString(R.string.pref_long_breaks_are_enabled)
     private val longBreakFrequencyKey = context.getString(R.string.pref_long_break_frequency)
-    private val sessionAutoSwitchKey = context.getString(R.string.pref_auto_session_switch_is_on)
 
     private val pomodoroSettingKeys = setOf(
             workDurationKey,
             shortBreakDurationKey,
             longBreakDurationKey,
             longBreaksAreEnabledKey,
-            longBreakFrequencyKey,
-            sessionAutoSwitchKey
+            longBreakFrequencyKey
     )
 
     override val settings: Pomodoro.Settings
@@ -36,8 +34,7 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroSettingsRepositor
                 shortBreakDuration,
                 longBreakDuration,
                 longBreaksAreEnabled,
-                numberOfSessionsBetweenLongBreaks,
-                autoSessionSwitchIsEnabled
+                numberOfSessionsBetweenLongBreaks
         )
 
     override var workDuration: Duration
@@ -64,8 +61,6 @@ class Prefs(context: Context) : KotprefModel(context), PomodoroSettingsRepositor
     override var longBreaksAreEnabled by booleanPref(default = true, key = longBreaksAreEnabledKey)
 
     override var numberOfSessionsBetweenLongBreaks by intPref(default = Pomodoro.DEFAULT_LONG_BREAK_FREQUENCY, key = longBreakFrequencyKey)
-
-    override var autoSessionSwitchIsEnabled by booleanPref(default = false, key = sessionAutoSwitchKey)
 
     // OnSharedPreferenceChangeListeners are stored in a WeakHashMap, so we need to store
     // an explicit reference to the listener to prevent it from being garbage-collected.

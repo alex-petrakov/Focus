@@ -3,6 +3,7 @@ package me.alex.pet.apps.focus.domain
 import me.alex.pet.apps.focus.common.extensions.isPositive
 import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
+import kotlin.math.max
 
 class SessionTimer(
         private val clock: Clock,
@@ -18,15 +19,15 @@ class SessionTimer(
             if (state != State.RUNNING) {
                 return
             }
-            val leftDuration = stopTimeInFuture - elapsedRealtime
+            val leftDuration = max(stopTimeInFuture - elapsedRealtime, 0L)
             remainingMillis = leftDuration
-            if (leftDuration <= 0) {
+            if (leftDuration == 0L) {
                 state = State.FINISHED
                 clock.stop()
                 clock.removeObserver(this)
-                observers.forEach { it.onFinish() }
+                observers.forEach { it.onTimerUpdate(Timer.Event.FINISHED) }
             } else {
-                observers.forEach { it.onTick() }
+                observers.forEach { it.onTimerUpdate(Timer.Event.TICK) }
             }
         }
     }
@@ -55,8 +56,8 @@ class SessionTimer(
         check(state == State.READY) { "This timer is not in a ${State.READY} state" }
         state = State.RUNNING
         observers.forEach { observer ->
-            observer.onStart()
-            observer.onResume()
+            observer.onTimerUpdate(Timer.Event.STARTED)
+            observer.onTimerUpdate(Timer.Event.RESUMED)
         }
         stopTimeInFuture = clock.now() + durationMillis
         clock.addObserver(clockObserver)
@@ -69,7 +70,7 @@ class SessionTimer(
         }
         state = State.PAUSED
         clock.stop()
-        observers.forEach { it.onPause() }
+        observers.forEach { it.onTimerUpdate(Timer.Event.PAUSED) }
     }
 
     override fun resume() {
@@ -77,7 +78,7 @@ class SessionTimer(
             return
         }
         state = State.RUNNING
-        observers.forEach { it.onResume() }
+        observers.forEach { it.onTimerUpdate(Timer.Event.RESUMED) }
         stopTimeInFuture = clock.now() + remainingMillis
         clock.start()
     }
@@ -86,7 +87,7 @@ class SessionTimer(
         state = State.CANCELLED
         clock.stop()
         clock.removeObserver(clockObserver)
-        observers.forEach { it.onCancel() }
+        observers.forEach { it.onTimerUpdate(Timer.Event.CANCELLED) }
     }
 
     override fun reset(duration: Duration) {
@@ -95,7 +96,7 @@ class SessionTimer(
         remainingMillis = durationMillis
         clock.stop()
         clock.removeObserver(clockObserver)
-        observers.forEach { it.onReset() }
+        observers.forEach { it.onTimerUpdate(Timer.Event.RESET) }
     }
 
     override fun addObserver(observer: Timer.Observer) {
