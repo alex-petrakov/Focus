@@ -46,10 +46,5 @@
             app:min="@integer/min_long_break_frequency"
             app:showSeekBarValue="true"
             app:title="@string/settings_session_count_between_long_breaks" />
-
-        <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:key="@string/pref_auto_session_switch_is_on"
-            app:title="@string/settings_auto_switch_sessions" />
     </PreferenceCategory>
 </PreferenceScreen>
