@@ -69,7 +69,6 @@ class Pomodoro constructor(
 
 
     init {
-        // TODO: unregister the observer
         settings.addObserver(settingsObserver)
         timer.reset(settings.workDuration)
         timer.addObserver(timerObserver)
