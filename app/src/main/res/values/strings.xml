@@ -15,14 +15,15 @@
 
     <string name="timer_completed_sessions_format">%1$d completed</string>
 
-    <string name="settings_category_general">General</string>
+    <string name="settings_category_pomodoro_options">Pomodoro options</string>
     <string name="settings_focus_session_duration">Focus session duration</string>
     <string name="settings_short_break_duration">Short break duration</string>
     <string name="settings_enable_long_breaks">Enable long breaks</string>
     <string name="settings_long_break_duration">Long break duration</string>
-    <string name="settings_session_count_between_long_breaks">Session count between long breaks</string>
+    <string name="settings_session_count_between_long_breaks">Number of sessions between long breaks</string>
 
     <string name="prefs_app" translatable="false">APP_PREFS</string>
+    <string name="pref_category_pomodoro_options" translatable="false">POMODORO_OPTIONS</string>
     <string name="pref_work_duration" translatable="false">WORK_DURATION</string>
     <string name="pref_short_break_duration" translatable="false">SHORT_BREAK_DURATION</string>
     <string name="pref_long_break_duration" translatable="false">LONG_BREAK_DURATION</string>

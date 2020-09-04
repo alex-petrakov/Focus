@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.chibatching.kotpref.KotprefModel
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.extensions.toIntMinutes
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.PomodoroSettings
 import me.alex.pet.apps.focus.domain.PomodoroSettings.Observer
@@ -17,27 +18,27 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
     override var workDuration: Duration
         get() = Duration.ofMinutes(_workDurationInMinutes.toLong())
         set(value) {
-            _workDurationInMinutes = value.toMinutes().clampToInt()
+            _workDurationInMinutes = value.toIntMinutes()
         }
-    private var _workDurationInMinutes by intPref(Pomodoro.DEFAULT_WORK_DURATION_MINUTES, R.string.pref_work_duration)
+    private var _workDurationInMinutes by intPref(Pomodoro.defaultWorkDuration.toIntMinutes(), R.string.pref_work_duration)
 
     override var shortBreakDuration: Duration
         get() = Duration.ofMinutes(_shortBreakDurationInMinutes.toLong())
         set(value) {
-            _workDurationInMinutes = value.toMinutes().clampToInt()
+            _workDurationInMinutes = value.toIntMinutes()
         }
-    private var _shortBreakDurationInMinutes by intPref(Pomodoro.DEFAULT_SHORT_BREAK_DURATION, R.string.pref_short_break_duration)
+    private var _shortBreakDurationInMinutes by intPref(Pomodoro.defaultShortBreakDuration.toIntMinutes(), R.string.pref_short_break_duration)
 
     override var longBreakDuration: Duration
         get() = Duration.ofMinutes(_longBreakDurationInMinutes.toLong())
         set(value) {
-            _longBreakDurationInMinutes = value.toMinutes().clampToInt()
+            _longBreakDurationInMinutes = value.toIntMinutes()
         }
-    private var _longBreakDurationInMinutes by intPref(Pomodoro.DEFAULT_LONG_BREAK_DURATION, R.string.pref_long_break_duration)
+    private var _longBreakDurationInMinutes by intPref(Pomodoro.defaultLongBreakDuration.toIntMinutes(), R.string.pref_long_break_duration)
 
-    override var longBreaksAreEnabled by booleanPref(true, R.string.pref_long_breaks_are_enabled)
+    override var longBreaksAreEnabled by booleanPref(Pomodoro.defaultLongBreaksAreEnabled, R.string.pref_long_breaks_are_enabled)
 
-    override var numberOfSessionsBetweenLongBreaks by intPref(Pomodoro.DEFAULT_LONG_BREAK_FREQUENCY, R.string.pref_long_break_frequency)
+    override var numberOfSessionsBetweenLongBreaks by intPref(Pomodoro.defaultLongBreakFrequency, R.string.pref_long_break_frequency)
 
     // OnSharedPreferenceChangeListeners are stored in a WeakHashMap, so we need to store
     // an explicit reference to the listener to prevent it from being garbage-collected.
@@ -85,13 +86,5 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
 
     private fun notifyAboutPomodoroSettingChange() {
         observers.forEach { it.onSettingsChange() }
-    }
-
-    private fun Long.clampToInt(): Int {
-        return when {
-            this > Int.MAX_VALUE -> Int.MAX_VALUE
-            this < Int.MIN_VALUE -> Int.MIN_VALUE
-            else -> toInt()
-        }
     }
 }

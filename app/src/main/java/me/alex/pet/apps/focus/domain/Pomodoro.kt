@@ -1,5 +1,6 @@
 package me.alex.pet.apps.focus.domain
 
+import me.alex.pet.apps.focus.common.extensions.minutes
 import me.alex.pet.apps.focus.domain.SessionType.*
 import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
@@ -151,9 +152,10 @@ class Pomodoro constructor(
     }
 
     companion object {
-        const val DEFAULT_WORK_DURATION_MINUTES = 25
-        const val DEFAULT_SHORT_BREAK_DURATION = 5
-        const val DEFAULT_LONG_BREAK_DURATION = 15
-        const val DEFAULT_LONG_BREAK_FREQUENCY = 4
+        val defaultWorkDuration = 25.minutes
+        val defaultShortBreakDuration = 5.minutes
+        val defaultLongBreakDuration = 15.minutes
+        const val defaultLongBreakFrequency = 3
+        const val defaultLongBreaksAreEnabled = true
     }
 }
