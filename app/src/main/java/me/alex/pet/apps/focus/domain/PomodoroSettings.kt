@@ -2,9 +2,7 @@ package me.alex.pet.apps.focus.domain
 
 import java.time.Duration
 
-interface PomodoroSettingsRepository {
-
-    val settings: Pomodoro.Settings
+interface PomodoroSettings {
 
     var workDuration: Duration
 
@@ -21,6 +19,6 @@ interface PomodoroSettingsRepository {
     fun removeObserver(observer: Observer)
 
     interface Observer {
-        fun onSettingsChange(settings: Pomodoro.Settings)
+        fun onSettingsChange()
     }
 }

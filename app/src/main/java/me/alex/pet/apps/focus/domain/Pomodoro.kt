@@ -6,16 +6,12 @@ import java.time.Duration
 
 class Pomodoro constructor(
         private val timer: Timer,
-        settingsRepository: PomodoroSettingsRepository
+        private val settings: PomodoroSettings
 ) {
     var completedWorkSessionCount = 0
         private set
 
     private var currentSessionType: SessionType = WORK
-
-    private var currentSettings: Settings = settingsRepository.settings
-
-    private var updatedSettings: Settings = currentSettings
 
     private var observers = mutableListOf<Observer>()
 
@@ -49,8 +45,8 @@ class Pomodoro constructor(
 
     private val nextSessionIsLongBreak: Boolean
         get() {
-            return currentSettings.longBreaksAreEnabled &&
-                    (completedWorkSessionCount % (currentSettings.numberOfSessionsBetweenLongBreaks + 1) == 0)
+            return settings.longBreaksAreEnabled &&
+                    (completedWorkSessionCount % (settings.numberOfSessionsBetweenLongBreaks + 1) == 0)
         }
 
     private val timerObserver = object : Timer.Observer {
@@ -62,9 +58,8 @@ class Pomodoro constructor(
         }
     }
 
-    private val settingsObserver = object : PomodoroSettingsRepository.Observer {
-        override fun onSettingsChange(settings: Settings) {
-            updatedSettings = settings
+    private val settingsObserver = object : PomodoroSettings.Observer {
+        override fun onSettingsChange() {
             if (timer.state == State.READY) {
                 changeSession(currentSessionType)
             }
@@ -74,8 +69,8 @@ class Pomodoro constructor(
 
     init {
         // TODO: unregister the observer
-        settingsRepository.addObserver(settingsObserver)
-        timer.reset(duration = currentSettings.workDuration)
+        settings.addObserver(settingsObserver)
+        timer.reset(settings.workDuration)
         timer.addObserver(timerObserver)
         currentSessionType = WORK
     }
@@ -111,15 +106,13 @@ class Pomodoro constructor(
     }
 
     private fun changeSession(nextSessionType: SessionType) {
-        currentSettings = updatedSettings
-
         val sessionDuration = when (nextSessionType) {
-            WORK -> currentSettings.workDuration
-            SHORT_BREAK -> currentSettings.shortBreakDuration
-            LONG_BREAK -> currentSettings.longBreakDuration
+            WORK -> settings.workDuration
+            SHORT_BREAK -> settings.shortBreakDuration
+            LONG_BREAK -> settings.longBreakDuration
         }
         currentSessionType = nextSessionType
-        timer.reset(duration = sessionDuration)
+        timer.reset(sessionDuration)
 
         notifyObservers()
     }
@@ -156,15 +149,6 @@ class Pomodoro constructor(
     private fun notifyObservers() {
         observers.forEach { it.onUpdate() }
     }
-
-
-    data class Settings(
-            val workDuration: Duration,
-            val shortBreakDuration: Duration,
-            val longBreakDuration: Duration,
-            val longBreaksAreEnabled: Boolean,
-            val numberOfSessionsBetweenLongBreaks: Int
-    )
 
     companion object {
         const val DEFAULT_WORK_DURATION_MINUTES = 25

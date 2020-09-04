@@ -331,12 +331,7 @@ class PomodoroTest {
         }
     }
 
-    private class StubSettingsProvider : PomodoroSettingsRepository {
-
-        override val settings: Pomodoro.Settings
-            get() = Pomodoro.Settings(
-                    workDuration, shortBreakDuration, longBreakDuration, longBreaksAreEnabled, numberOfSessionsBetweenLongBreaks
-            )
+    private class StubSettingsProvider : PomodoroSettings {
 
         override var workDuration: Duration = 25.minutes
 
@@ -348,22 +343,22 @@ class PomodoroTest {
 
         override var numberOfSessionsBetweenLongBreaks: Int = 3
 
-        private var observers = mutableListOf<PomodoroSettingsRepository.Observer>()
+        private var observers = mutableListOf<PomodoroSettings.Observer>()
 
-        override fun addObserver(observer: PomodoroSettingsRepository.Observer) {
+        override fun addObserver(observer: PomodoroSettings.Observer) {
             observers = observers.toMutableList().apply {
                 add(observer)
             }
         }
 
-        override fun removeObserver(observer: PomodoroSettingsRepository.Observer) {
+        override fun removeObserver(observer: PomodoroSettings.Observer) {
             observers = observers.toMutableList().apply {
                 remove(observer)
             }
         }
 
         fun notifyListeners() {
-            observers.forEach { it.onSettingsChange(settings) }
+            observers.forEach { it.onSettingsChange() }
         }
     }
 }
