@@ -37,6 +37,17 @@ class SessionTimerTest {
     }
 
     @Test
+    @Suppress("UsePropertyAccessSyntax")
+    fun `timer with 0 duration finishes immediately after start`() {
+        val timer = createTimer(duration = 0.minutes)
+
+        timer.start()
+
+        assertThat(timer).hasState(timerState = State.FINISHED, remainingDuration = 0.minutes, passedDuration = 0.minutes)
+        assertThat(clock.isRunning).isFalse()
+    }
+
+    @Test
     fun `timer can't be started twice`() {
         val timer = createTimer().apply {
             start()
@@ -180,6 +191,15 @@ class SessionTimerTest {
     }
 
     @Test
+    fun `timer can't be reset with a negative duration`() {
+        val timer = createTimer()
+
+        assertThrows<IllegalArgumentException> {
+            timer.reset(duration = (-1).minutes)
+        }
+    }
+
+    @Test
     fun `timer updates progress on each timer tick`() {
         val timer = createTimer().apply {
             start()
@@ -221,7 +241,7 @@ class SessionTimerTest {
         return SessionTimer(clock, duration)
     }
 
-    class StubClock : Clock {
+    private class StubClock : Clock {
 
         private var observers = mutableListOf<Clock.Observer>()
 

@@ -28,13 +28,7 @@ interface Timer {
 
 
     interface Observer {
-        fun onStart()
-        fun onResume()
-        fun onPause()
-        fun onTick()
-        fun onFinish()
-        fun onCancel()
-        fun onReset()
+        fun onTimerUpdate(event: Event)
     }
 
     enum class State {
@@ -43,5 +37,15 @@ interface Timer {
         PAUSED,
         FINISHED,
         CANCELLED
+    }
+
+    enum class Event {
+        STARTED,
+        RESUMED,
+        PAUSED,
+        TICK,
+        FINISHED,
+        CANCELLED,
+        RESET
     }
 }

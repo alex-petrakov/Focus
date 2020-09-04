@@ -1,74 +1,18 @@
 package me.alex.pet.apps.focus.domain
 
+import me.alex.pet.apps.focus.common.extensions.minutes
 import me.alex.pet.apps.focus.domain.SessionType.*
 import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
 
 class Pomodoro constructor(
         private val timer: Timer,
-        settingsRepository: PomodoroSettingsRepository
+        private val settings: PomodoroSettings
 ) {
-    private val timerObserver = object : Timer.Observer {
-        override fun onStart() {
-            notifyObservers()
-        }
-
-        override fun onResume() {
-            notifyObservers()
-        }
-
-        override fun onPause() {
-            notifyObservers()
-        }
-
-        override fun onTick() {
-            notifyObservers()
-        }
-
-        override fun onFinish() {
-            if (currentSessionType == WORK) {
-                completedWorkSessionCount++
-            }
-            notifyObservers()
-
-            if (currentSettings.autoSessionSwitchIsEnabled) {
-                changeSession(nextSessionType)
-                startSession()
-            } else {
-                isAwaitingSessionSwitch = true
-                notifyObservers()
-            }
-        }
-
-        override fun onCancel() {
-            notifyObservers()
-        }
-
-        override fun onReset() {
-            notifyObservers()
-        }
-    }
-
-    private var currentSettings: Settings = settingsRepository.settings
-
-    private var updatedSettings: Settings = currentSettings
-
-    private var currentSessionType: SessionType = WORK
-
-    private val settingsObserver = object : PomodoroSettingsRepository.Observer {
-        override fun onSettingsChange(settings: Settings) {
-            updatedSettings = settings
-            if (timer.state == State.READY) {
-                changeSession(currentSessionType)
-            }
-        }
-    }
-
     var completedWorkSessionCount = 0
         private set
 
-    var isAwaitingSessionSwitch = false
-        private set
+    private var currentSessionType: SessionType = WORK
 
     private var observers = mutableListOf<Observer>()
 
@@ -91,6 +35,9 @@ class Pomodoro constructor(
     val timerState: State
         get() = timer.state
 
+    val isAwaitingSessionSwitch
+        get() = timerState == State.FINISHED && remainingDuration.isZero
+
     val nextSessionType
         get() = when (currentSessionType) {
             WORK -> if (nextSessionIsLongBreak) LONG_BREAK else SHORT_BREAK
@@ -99,15 +46,31 @@ class Pomodoro constructor(
 
     private val nextSessionIsLongBreak: Boolean
         get() {
-            return currentSettings.longBreaksAreEnabled &&
-                    (completedWorkSessionCount % (currentSettings.numberOfSessionsBetweenLongBreaks + 1) == 0)
+            return settings.longBreaksAreEnabled &&
+                    (completedWorkSessionCount % (settings.numberOfSessionsBetweenLongBreaks + 1) == 0)
         }
+
+    private val timerObserver = object : Timer.Observer {
+        override fun onTimerUpdate(event: Timer.Event) {
+            when (event) {
+                Timer.Event.FINISHED -> onTimerFinished()
+                else -> onTimerUpdated()
+            }
+        }
+    }
+
+    private val settingsObserver = object : PomodoroSettings.Observer {
+        override fun onSettingsChange() {
+            if (timer.state == State.READY) {
+                changeSession(currentSessionType)
+            }
+        }
+    }
 
 
     init {
-        // TODO: unregister the observer
-        settingsRepository.addObserver(settingsObserver)
-        timer.reset(duration = currentSettings.workDuration)
+        settings.addObserver(settingsObserver)
+        timer.reset(settings.workDuration)
         timer.addObserver(timerObserver)
         currentSessionType = WORK
     }
@@ -138,21 +101,18 @@ class Pomodoro constructor(
 
     fun startNextSession() {
         check(isAwaitingSessionSwitch) { "currentSession isn't completed yet" }
-        isAwaitingSessionSwitch = false
         changeSession(nextSessionType)
         startSession()
     }
 
     private fun changeSession(nextSessionType: SessionType) {
-        currentSettings = updatedSettings
-
         val sessionDuration = when (nextSessionType) {
-            WORK -> currentSettings.workDuration
-            SHORT_BREAK -> currentSettings.shortBreakDuration
-            LONG_BREAK -> currentSettings.longBreakDuration
+            WORK -> settings.workDuration
+            SHORT_BREAK -> settings.shortBreakDuration
+            LONG_BREAK -> settings.longBreakDuration
         }
         currentSessionType = nextSessionType
-        timer.reset(duration = sessionDuration)
+        timer.reset(sessionDuration)
 
         notifyObservers()
     }
@@ -160,7 +120,6 @@ class Pomodoro constructor(
     fun reset() {
         timer.cancel()
         completedWorkSessionCount = 0
-        isAwaitingSessionSwitch = false
         changeSession(WORK)
     }
 
@@ -176,24 +135,26 @@ class Pomodoro constructor(
         }
     }
 
+    private fun onTimerFinished() {
+        if (currentSessionType == WORK) {
+            completedWorkSessionCount++
+        }
+        notifyObservers()
+    }
+
+    private fun onTimerUpdated() {
+        notifyObservers()
+    }
+
     private fun notifyObservers() {
         observers.forEach { it.onUpdate() }
     }
 
-
-    data class Settings(
-            val workDuration: Duration,
-            val shortBreakDuration: Duration,
-            val longBreakDuration: Duration,
-            val longBreaksAreEnabled: Boolean,
-            val numberOfSessionsBetweenLongBreaks: Int,
-            val autoSessionSwitchIsEnabled: Boolean
-    )
-
     companion object {
-        const val DEFAULT_WORK_DURATION_MINUTES = 25
-        const val DEFAULT_SHORT_BREAK_DURATION = 5
-        const val DEFAULT_LONG_BREAK_DURATION = 15
-        const val DEFAULT_LONG_BREAK_FREQUENCY = 4
+        val defaultWorkDuration = 25.minutes
+        val defaultShortBreakDuration = 5.minutes
+        val defaultLongBreakDuration = 15.minutes
+        const val defaultLongBreakFrequency = 3
+        const val defaultLongBreaksAreEnabled = true
     }
 }
