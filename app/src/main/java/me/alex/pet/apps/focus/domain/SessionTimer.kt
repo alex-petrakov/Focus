@@ -1,6 +1,5 @@
 package me.alex.pet.apps.focus.domain
 
-import me.alex.pet.apps.focus.common.extensions.isPositive
 import me.alex.pet.apps.focus.domain.Timer.State
 import java.time.Duration
 import kotlin.math.max
@@ -49,17 +48,22 @@ class SessionTimer(
     private var observers = mutableListOf<Timer.Observer>()
 
     init {
-        require(duration.isPositive) { "Timer duration can't be negative" }
+        require(!duration.isNegative) { "Timer duration can't be negative" }
     }
 
     override fun start() {
         check(state == State.READY) { "This timer is not in a ${State.READY} state" }
         state = State.RUNNING
+        stopTimeInFuture = clock.now() + durationMillis
         observers.forEach { observer ->
             observer.onTimerUpdate(Timer.Event.STARTED)
             observer.onTimerUpdate(Timer.Event.RESUMED)
         }
-        stopTimeInFuture = clock.now() + durationMillis
+        if (durationMillis == 0L) {
+            observers.forEach { it.onTimerUpdate(Timer.Event.FINISHED) }
+            state = State.FINISHED
+            return
+        }
         clock.addObserver(clockObserver)
         clock.start()
     }
@@ -91,6 +95,7 @@ class SessionTimer(
     }
 
     override fun reset(duration: Duration) {
+        require(!duration.isNegative) { "Timer duration can't be negative" }
         state = State.READY
         durationMillis = duration.toMillis()
         remainingMillis = durationMillis
