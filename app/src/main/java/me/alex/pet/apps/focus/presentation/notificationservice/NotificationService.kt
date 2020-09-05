@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.app.NotificationManagerCompat
+import me.alex.pet.apps.focus.data.NotificationSoundPlayer
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.SessionType
 import me.alex.pet.apps.focus.domain.Timer
@@ -18,6 +19,8 @@ class NotificationService : Service() {
 
     private val pomodoro by inject<Pomodoro>()
 
+    private val notificationSoundPlayer by inject<NotificationSoundPlayer>()
+
     private val pomodoroObserver = object : Pomodoro.Observer {
         override fun onUpdate() {
             Timber.d("onUpdate() ${pomodoro.remainingDuration}")
@@ -26,6 +29,9 @@ class NotificationService : Service() {
                 stopSelf()
             } else {
                 updateNotification(pomodoro.toNotification())
+                if (pomodoro.isAwaitingSessionSwitch) {
+                    notificationSoundPlayer.play()
+                }
             }
         }
     }
