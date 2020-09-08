@@ -21,6 +21,9 @@
     <string name="settings_enable_long_breaks">Enable long breaks</string>
     <string name="settings_long_break_duration">Long break duration</string>
     <string name="settings_session_count_between_long_breaks">Number of sessions between long breaks</string>
+    <string name="settings_category_notifications">Notifications</string>
+    <string name="settings_enable_notification_sound">Enable notification sound</string>
+    <string name="settings_notification_sound">Notification sound</string>
 
     <string name="prefs_app" translatable="false">APP_PREFS</string>
     <string name="pref_category_pomodoro_options" translatable="false">POMODORO_OPTIONS</string>
@@ -29,4 +32,7 @@
     <string name="pref_long_break_duration" translatable="false">LONG_BREAK_DURATION</string>
     <string name="pref_long_breaks_are_enabled" translatable="false">LONG_BREAKS_ARE_ENABLED</string>
     <string name="pref_long_break_frequency" translatable="false">LONG_BREAK_FREQUENCY</string>
+    <string name="pref_category_notification" translatable="false">NOTIFICATIONS</string>
+    <string name="pref_sound_on_off" translatable="false">SOUND_ON_OFF</string>
+    <string name="pref_sound" translatable="false">SOUND</string>
 </resources>
