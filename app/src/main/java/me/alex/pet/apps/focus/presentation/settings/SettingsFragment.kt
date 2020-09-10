@@ -71,6 +71,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val ringtoneTitle = RingtoneManager.getRingtone(context, ringtoneUri).getTitle(context)
                 pref.summary = ringtoneTitle
             }
+
+            createVibrationOnOffPreference(context).also { pref ->
+                category.addPreference(pref)
+            }
         }
     }
 
@@ -201,5 +205,13 @@ private fun createSoundPreference(context: Context): Preference {
         key = context.getString(R.string.pref_sound)
         title = context.getString(R.string.settings_notification_sound)
         setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI)
+    }
+}
+
+private fun createVibrationOnOffPreference(context: Context): Preference {
+    return SwitchPreference(context).apply {
+        key = context.getString(R.string.pref_vibration_on_off)
+        title = context.getString(R.string.settings_enable_vibration)
+        setDefaultValue(true)
     }
 }

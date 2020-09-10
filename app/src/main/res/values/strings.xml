@@ -24,6 +24,7 @@
     <string name="settings_category_notifications">Notifications</string>
     <string name="settings_enable_notification_sound">Enable notification sound</string>
     <string name="settings_notification_sound">Notification sound</string>
+    <string name="settings_enable_vibration">Enable vibration</string>
 
     <string name="prefs_app" translatable="false">APP_PREFS</string>
     <string name="pref_category_pomodoro_options" translatable="false">POMODORO_OPTIONS</string>
@@ -35,4 +36,5 @@
     <string name="pref_category_notification" translatable="false">NOTIFICATIONS</string>
     <string name="pref_sound_on_off" translatable="false">SOUND_ON_OFF</string>
     <string name="pref_sound" translatable="false">SOUND</string>
+    <string name="pref_vibration_on_off" translatable="false">VIBRATION_ON_OFF</string>
 </resources>
