@@ -11,6 +11,7 @@ import androidx.core.content.edit
 import androidx.preference.*
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.extensions.toIntMinutes
+import me.alex.pet.apps.focus.data.NotificationPrefs
 import me.alex.pet.apps.focus.domain.Pomodoro
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -66,7 +67,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 category.addPreference(pref)
                 pref.dependency = soundOnOffPreference.key
 
-                val storedUriString = pref.sharedPreferences.getString(pref.key, Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+                val storedUriString = pref.sharedPreferences.getString(pref.key, NotificationPrefs.defaultNotificationSoundUri.toString())
                 val ringtoneUri = Uri.parse(storedUriString)
                 val ringtoneTitle = RingtoneManager.getRingtone(context, ringtoneUri).getTitle(context)
                 pref.summary = ringtoneTitle
@@ -83,7 +84,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         soundPreference.setOnPreferenceClickListener { preference ->
             val pickerTitle = preference.context.getString(R.string.settings_notification_sound)
 
-            val storedUriString = preference.sharedPreferences.getString(preference.key, Settings.System.DEFAULT_NOTIFICATION_URI.toString())
+            val storedUriString = preference.sharedPreferences.getString(preference.key, NotificationPrefs.defaultNotificationSoundUri.toString())
             val ringtoneUri = Uri.parse(storedUriString)
 
             val intent = createRingtonePickerIntent(pickerTitle, ringtoneUri)
@@ -196,7 +197,7 @@ private fun createSoundOnOffPreference(context: Context): Preference {
     return SwitchPreference(context).apply {
         key = context.getString(R.string.pref_sound_on_off)
         title = context.getString(R.string.settings_enable_notification_sound)
-        setDefaultValue(true)
+        setDefaultValue(NotificationPrefs.defaultSoundIsEnabled)
     }
 }
 
@@ -204,7 +205,7 @@ private fun createSoundPreference(context: Context): Preference {
     return Preference(context).apply {
         key = context.getString(R.string.pref_sound)
         title = context.getString(R.string.settings_notification_sound)
-        setDefaultValue(Settings.System.DEFAULT_NOTIFICATION_URI)
+        setDefaultValue(NotificationPrefs.defaultNotificationSoundUri)
     }
 }
 
@@ -212,6 +213,6 @@ private fun createVibrationOnOffPreference(context: Context): Preference {
     return SwitchPreference(context).apply {
         key = context.getString(R.string.pref_vibration_on_off)
         title = context.getString(R.string.settings_enable_vibration)
-        setDefaultValue(true)
+        setDefaultValue(NotificationPrefs.defaultVibrationIsEnabled)
     }
 }
