@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Material theme colors -->
-    <color name="colorPrimary">#000</color>
-    <color name="colorPrimaryVariant">#000</color>
+    <color name="colorPrimary">#0A77D6</color>
+    <color name="colorPrimaryVariant">#0051a9</color>
     <color name="colorOnPrimary">#FFF</color>
-    <color name="colorSecondary">#000</color>
-    <color name="colorSecondaryVariant">#000</color>
+    <color name="colorSecondary">#0A77D6</color>
+    <color name="colorSecondaryVariant">#0051a9</color>
     <color name="colorOnSecondary">#FFF</color>
     <color name="colorError">#CF0000</color>
     <color name="colorOnError">#FFF</color>
@@ -16,4 +16,6 @@
 
     <!-- Custom colors -->
     <color name="colorSurfaceDark">#757575</color>
+    <color name="colorRest">#18CDA1</color>
+    <color name="colorFocus">#FF7A00</color>
 </resources>
