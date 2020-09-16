@@ -2,17 +2,17 @@
 <resources>
     <!-- Material theme colors -->
     <color name="colorPrimary">#0A77D6</color>
-    <color name="colorPrimaryVariant">#0051a9</color>
-    <color name="colorOnPrimary">#FFF</color>
+    <color name="colorPrimaryVariant">#0051A9</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorSecondary">#0A77D6</color>
-    <color name="colorSecondaryVariant">#0051a9</color>
-    <color name="colorOnSecondary">#FFF</color>
+    <color name="colorSecondaryVariant">#0051A9</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
     <color name="colorError">#CF0000</color>
-    <color name="colorOnError">#FFF</color>
-    <color name="colorBackground">#FFF</color>
-    <color name="colorOnBackground">#000</color>
-    <color name="colorSurface">#FFF</color>
-    <color name="colorOnSurface">#000</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#000000</color>
 
     <!-- Custom colors -->
     <color name="colorSurfaceDark">#757575</color>
