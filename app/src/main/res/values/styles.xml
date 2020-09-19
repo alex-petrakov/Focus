@@ -13,9 +13,79 @@
         <item name="colorOnBackground">@color/colorOnBackground</item>
         <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorFocus">@color/colorFocus</item>
+        <item name="colorRest">@color/colorRest</item>
+
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <item name="android:textColorTertiary">@color/colorTextTertiary</item>
+
+        <item name="textAppearanceHeadline1">@style/TextAppearance.Focus.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.Focus.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.Focus.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.Focus.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Focus.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Focus.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Focus.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Focus.Subtitle2</item>
+        <item name="textAppearanceTimer">@style/TextAppearance.Focus.Timer</item>
     </style>
 
     <style name="AppTheme" parent="BaseAppTheme">
         <item name="android:statusBarColor">@color/colorSurfaceDark</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="android:fontFamily">@font/montserrat_light</item>
+        <item name="fontFamily">@font/montserrat_light</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="android:fontFamily">@font/montserrat_regular</item>
+        <item name="fontFamily">@font/montserrat_regular</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="fontFamily">@font/montserrat_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="fontFamily">@font/montserrat_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="fontFamily">@font/montserrat_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="fontFamily">@font/montserrat_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="fontFamily">@font/montserrat_medium</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:fontFamily">@font/montserrat_semi_bold</item>
+        <item name="fontFamily">@font/montserrat_semi_bold</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Focus.Timer" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/ibm_plex_mono_light</item>
+        <item name="fontFamily">@font/ibm_plex_mono_light</item>
+        <item name="android:textSize">96sp</item>
     </style>
 </resources>

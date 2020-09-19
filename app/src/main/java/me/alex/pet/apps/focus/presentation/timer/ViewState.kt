@@ -1,31 +1,27 @@
 package me.alex.pet.apps.focus.presentation.timer
 
-import android.graphics.drawable.Drawable
+import android.text.Spanned
+import androidx.annotation.DrawableRes
+import me.alex.pet.apps.focus.R
 
 data class ViewState(
         val timer: Timer,
-        val progress: Progress,
+        val transitionPrompt: TransitionPrompt,
         val sessionCount: SessionCount,
-        val toggle: Toggle,
-        val resetBtnIsVisible: Boolean,
-        val visiblePanel: Panel
+        val sessionIndicator: SessionIndicator,
+        val toggleButton: ToggleButton,
+        val resetButton: ResetButton
 ) {
 
-    enum class Panel {
-        TIMER,
-        WORK_INTRO,
-        BREAK_INTRO
-    }
-
     data class Timer(
+            val isVisible: Boolean,
             val text: String,
             val isBlinking: Boolean
     )
 
-    data class Progress(
+    data class TransitionPrompt(
             val isVisible: Boolean,
-            val value: Int,
-            val color: Int
+            val text: Spanned
     )
 
     data class SessionCount(
@@ -33,9 +29,22 @@ data class ViewState(
             val text: String
     )
 
-    data class Toggle(
+    data class SessionIndicator(
             val isVisible: Boolean,
-            val text: String,
-            val icon: Drawable
+            @DrawableRes val iconRes: Int
     )
+
+    data class ToggleButton(
+            val action: Action
+    ) {
+        enum class Action(val textRes: Int, val iconRes: Int) {
+            START(R.string.app_action_start, R.drawable.ic_action_start),
+            PAUSE(R.string.app_action_pause, R.drawable.ic_action_pause),
+            RESUME(R.string.app_action_resume, R.drawable.ic_action_start),
+            START_WORK(R.string.app_start_work_session, R.drawable.ic_action_switch_session),
+            START_BREAK(R.string.app_start_break, R.drawable.ic_action_switch_session)
+        }
+    }
+
+    data class ResetButton(val isVisible: Boolean)
 }

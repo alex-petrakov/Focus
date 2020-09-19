@@ -7,6 +7,8 @@
     <string name="app_action_pause">Pause</string>
     <string name="app_action_resume">Resume</string>
     <string name="app_action_reset">Reset</string>
+    <string name="app_ready_to_take_a_break">Ready to take a <annotation emphasis="rest">break</annotation>?</string>
+    <string name="app_ready_to_start_a_work_session">Ready to start a <annotation emphasis="focus">work session</annotation>?</string>
     <string name="app_start_work_session">Start focus session</string>
     <string name="app_start_break">Start break</string>
     <string name="app_settings">Settings</string>

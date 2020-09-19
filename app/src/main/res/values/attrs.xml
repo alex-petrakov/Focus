@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorFocus" format="reference|color" />
+    <attr name="colorRest" format="reference|color" />
+
+    <attr name="textAppearanceTimer" format="reference" />
+</resources>

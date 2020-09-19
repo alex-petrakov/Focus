@@ -46,18 +46,8 @@ class TimerFragment : Fragment() {
         super.onStart()
         binding.apply {
             toolbar.setOnMenuItemClickListener(::handleMenuItemClick)
-            timerLayout.apply {
-                toggleFab.setOnClickListener { model.onToggleTimer() }
-                resetBtn.setOnClickListener { model.onReset() }
-            }
-            workIntroLayout.apply {
-                startWorkSessionBtn.setOnClickListener { model.onSwitchToNextSession() }
-                resetBtn.setOnClickListener { model.onReset() }
-            }
-            breakIntroLayout.apply {
-                startWorkSessionBtn.setOnClickListener { model.onSwitchToNextSession() }
-                resetBtn.setOnClickListener { model.onReset() }
-            }
+            toggleFab.setOnClickListener { model.onToggleTimer() }
+            resetBtn.setOnClickListener { model.onReset() }
         }
     }
 
@@ -73,21 +63,22 @@ class TimerFragment : Fragment() {
 
     private fun renderState(state: ViewState) {
         binding.apply {
-            timerLayout.apply {
-                timerTv.text = state.timer.text
+            timerTv.isVisible = state.timer.isVisible
+            timerTv.text = state.timer.text
 
-                completedSessionsTv.text = state.sessionCount.text
-                completedSessionsTv.isVisible = state.sessionCount.isVisible
+            sessionSwitchPromptTv.isVisible = state.transitionPrompt.isVisible
+            sessionSwitchPromptTv.text = state.transitionPrompt.text
 
-                toggleFab.setImageDrawable(state.toggle.icon)
-                toggleFab.contentDescription = state.toggle.text
+            completedSessionsTv.text = state.sessionCount.text
+            completedSessionsTv.isVisible = state.sessionCount.isVisible
 
-                resetBtn.isVisible = state.resetBtnIsVisible
+            sessionTypeIv.setImageDrawable(requireContext().getDrawable(state.sessionIndicator.iconRes))
+            sessionTypeIv.isVisible = state.sessionIndicator.isVisible
 
-                root.isVisible = state.visiblePanel == ViewState.Panel.TIMER
-            }
-            workIntroLayout.root.isVisible = state.visiblePanel == ViewState.Panel.WORK_INTRO
-            breakIntroLayout.root.isVisible = state.visiblePanel == ViewState.Panel.BREAK_INTRO
+            toggleFab.setImageResource(state.toggleButton.action.iconRes)
+            toggleFab.contentDescription = getString(state.toggleButton.action.textRes)
+
+            resetBtn.isVisible = state.resetButton.isVisible
         }
     }
 
