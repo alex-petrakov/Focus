@@ -16,10 +16,6 @@
         <item name="colorFocus">@color/colorFocus</item>
         <item name="colorRest">@color/colorRest</item>
 
-        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
-        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
-        <item name="android:textColorTertiary">@color/colorTextTertiary</item>
-
         <item name="textAppearanceHeadline1">@style/TextAppearance.Focus.Headline1</item>
         <item name="textAppearanceHeadline2">@style/TextAppearance.Focus.Headline2</item>
         <item name="textAppearanceHeadline3">@style/TextAppearance.Focus.Headline3</item>
