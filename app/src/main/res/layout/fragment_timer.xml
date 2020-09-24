@@ -24,19 +24,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="16dp"
+                android:alpha="0"
                 android:drawableStart="@drawable/ic_checkmark"
                 android:drawablePadding="2dp"
                 android:gravity="center_vertical"
                 android:textAppearance="?textAppearanceSubtitle1"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@+id/timer_tv"
                 app:layout_constraintTop_toBottomOf="@+id/timer_tv"
-                tools:text="2" />
+                tools:alpha="1"
+                tools:text="2"
+                tools:visibility="visible" />
 
             <ImageView
                 android:id="@+id/session_type_iv"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                tools:src="@drawable/ic_session_work" />
+                android:alpha="0"
+                android:visibility="gone"
+                tools:alpha="1"
+                tools:src="@drawable/ic_session_work"
+                tools:visibility="visible" />
         </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -83,6 +91,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:alpha="0"
         android:text="@string/app_action_reset"
         android:visibility="gone"
         app:icon="@drawable/ic_action_reset"
@@ -90,5 +99,6 @@
         app:layout_constraintEnd_toStartOf="@+id/toggle_fab"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/toggle_fab"
+        tools:alpha="1"
         tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.extensions.animateVisibility
 import me.alex.pet.apps.focus.common.extensions.observe
 import me.alex.pet.apps.focus.common.extensions.requireAppContext
 import me.alex.pet.apps.focus.databinding.FragmentTimerBinding
@@ -23,6 +24,8 @@ class TimerFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val model by viewModel<TimerModel>()
+
+    private var lastState: ViewState? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentTimerBinding.inflate(inflater, container, false)
@@ -62,23 +65,80 @@ class TimerFragment : Fragment() {
     }
 
     private fun renderState(state: ViewState) {
-        binding.apply {
-            timerTv.isVisible = state.timer.isVisible
-            timerTv.text = state.timer.text
+        when (lastState) {
+            null -> renderWithoutAnimations(state)
+            else -> renderWithAnimations(state)
+        }
 
-            sessionSwitchPromptTv.isVisible = state.transitionPrompt.isVisible
-            sessionSwitchPromptTv.text = state.transitionPrompt.text
+        lastState = state
+    }
 
-            completedSessionsTv.text = state.sessionCount.text
-            completedSessionsTv.isVisible = state.sessionCount.isVisible
+    private fun renderWithoutAnimations(state: ViewState) = binding.apply {
+        timerTv.apply {
+            isVisible = state.timer.isVisible
+            text = state.timer.text
+        }
 
-            sessionTypeIv.setImageDrawable(requireContext().getDrawable(state.sessionIndicator.iconRes))
-            sessionTypeIv.isVisible = state.sessionIndicator.isVisible
+        sessionSwitchPromptTv.apply {
+            isVisible = state.transitionPrompt.isVisible
+            text = state.transitionPrompt.text
+        }
 
-            toggleFab.setImageResource(state.toggleButton.action.iconRes)
-            toggleFab.contentDescription = getString(state.toggleButton.action.textRes)
+        completedSessionsTv.apply {
+            text = state.sessionCount.text
+            isVisible = state.sessionCount.isVisible
+            alpha = if (state.sessionCount.isVisible) 1f else 0f
+        }
 
-            resetBtn.isVisible = state.resetButton.isVisible
+        sessionTypeIv.apply {
+            setImageDrawable(requireContext().getDrawable(state.sessionIndicator.iconRes))
+            isVisible = state.sessionIndicator.isVisible
+            alpha = if (state.sessionIndicator.isVisible) 1f else 0f
+        }
+
+        toggleFab.apply {
+            setImageResource(state.toggleButton.action.iconRes)
+            contentDescription = getString(state.toggleButton.action.textRes)
+        }
+
+        resetBtn.apply {
+            isVisible = state.resetButton.isVisible
+            alpha = if (state.resetButton.isVisible) 1f else 0f
+        }
+    }
+
+    private fun renderWithAnimations(state: ViewState) = binding.apply {
+        timerTv.apply {
+            isVisible = state.timer.isVisible
+            text = state.timer.text
+        }
+
+        sessionSwitchPromptTv.apply {
+            isVisible = state.transitionPrompt.isVisible
+            text = state.transitionPrompt.text
+        }
+
+        diff(lastState, state, ViewState::sessionCount) { count ->
+            completedSessionsTv.apply {
+                text = count.text
+                animateVisibility(count.isVisible)
+            }
+        }
+
+        diff(lastState, state, ViewState::sessionIndicator) { indicator ->
+            sessionTypeIv.apply {
+                setImageDrawable(requireContext().getDrawable(indicator.iconRes))
+                animateVisibility(indicator.isVisible)
+            }
+        }
+
+        toggleFab.apply {
+            setImageResource(state.toggleButton.action.iconRes)
+            contentDescription = getString(state.toggleButton.action.textRes)
+        }
+
+        diff(lastState, state, ViewState::resetButton) { resetButton ->
+            resetBtn.animateVisibility(resetButton.isVisible)
         }
     }
 
@@ -98,5 +158,20 @@ class TimerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        lastState = null
+    }
+}
+
+
+private inline fun <S, P> diff(oldState: S?, newState: S, getPropertyFrom: (S) -> P, onDiff: (P) -> Unit) {
+    val newValue = getPropertyFrom(newState)
+    when (oldState) {
+        null -> onDiff(newValue)
+        else -> {
+            val oldValue = getPropertyFrom(oldState)
+            if (oldValue != newValue) {
+                onDiff(newValue)
+            }
+        }
     }
 }
