@@ -1,12 +1,12 @@
 package me.alex.pet.apps.focus.presentation.timer
 
-import android.text.Spanned
 import androidx.annotation.DrawableRes
 import me.alex.pet.apps.focus.R
 
 data class ViewState(
         val timer: Timer,
-        val transitionPrompt: TransitionPrompt,
+        val workIntro: WorkIntro,
+        val breakIntro: BreakIntro,
         val sessionCount: SessionCount,
         val sessionIndicator: SessionIndicator,
         val toggleButton: ToggleButton,
@@ -19,9 +19,12 @@ data class ViewState(
             val isBlinking: Boolean
     )
 
-    data class TransitionPrompt(
-            val isVisible: Boolean,
-            val text: Spanned
+    data class WorkIntro(
+            val isVisible: Boolean
+    )
+
+    data class BreakIntro(
+            val isVisible: Boolean
     )
 
     data class SessionCount(

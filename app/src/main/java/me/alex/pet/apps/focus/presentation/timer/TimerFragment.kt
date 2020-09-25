@@ -1,17 +1,32 @@
 package me.alex.pet.apps.focus.presentation.timer
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Annotation
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
+import androidx.core.graphics.ColorUtils
+import androidx.core.text.getSpans
+import androidx.core.text.set
+import androidx.core.text.toSpanned
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import com.google.android.material.transition.MaterialFade
+import com.google.android.material.transition.MaterialFadeThrough
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.extensions.getColorCompat
 import me.alex.pet.apps.focus.common.extensions.observe
 import me.alex.pet.apps.focus.common.extensions.requireAppContext
 import me.alex.pet.apps.focus.databinding.FragmentTimerBinding
@@ -36,7 +51,11 @@ class TimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.toolbar.inflateMenu(R.menu.menu_timer)
+        binding.apply {
+            toolbar.inflateMenu(R.menu.menu_timer)
+            workIntroTv.text = requireContext().getStyledSpannable(R.string.app_ready_to_start_a_work_session)
+            breakIntroTv.text = requireContext().getStyledSpannable(R.string.app_ready_to_take_a_break)
+        }
         subscribeToModel()
     }
 
@@ -81,10 +100,9 @@ class TimerFragment : Fragment() {
             text = state.timer.text
         }
 
-        sessionSwitchPromptTv.apply {
-            isVisible = state.transitionPrompt.isVisible
-            text = state.transitionPrompt.text
-        }
+        workIntroTv.isVisible = state.workIntro.isVisible
+
+        breakIntroTv.isVisible = state.breakIntro.isVisible
 
         completedSessionsTv.apply {
             text = state.sessionCount.text
@@ -107,19 +125,23 @@ class TimerFragment : Fragment() {
     }
 
     private fun renderWithAnimations(state: ViewState) = binding.apply {
-        MaterialFade().setDuration(200)
-                .excludeTargets(timerTv, sessionSwitchPromptTv, toggleFab, toolbar)
-                .let { fade -> TransitionManager.beginDelayedTransition(root, fade) }
+        val smallViewsFade = MaterialFade().setDuration(200)
+                .excludeTargets(timerTv, workIntroTv, breakIntroTv, toggleFab, toolbar)
+        val primaryViewsFadeThrough = MaterialFadeThrough().setDuration(400)
+                .excludeTargets(resetBtn, toggleFab, toolbar, completedSessionsTv, sessionTypeIv)
+        TransitionSet().setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(smallViewsFade)
+                .addTransition(primaryViewsFadeThrough)
+                .let { TransitionManager.beginDelayedTransition(root, it) }
 
         timerTv.apply {
             isVisible = state.timer.isVisible
             text = state.timer.text
         }
 
-        sessionSwitchPromptTv.apply {
-            isVisible = state.transitionPrompt.isVisible
-            text = state.transitionPrompt.text
-        }
+        workIntroTv.isVisible = state.workIntro.isVisible
+
+        breakIntroTv.isVisible = state.breakIntro.isVisible
 
         diff(lastState, state, ViewState::sessionCount) { count ->
             completedSessionsTv.apply {
@@ -184,4 +206,35 @@ private fun Transition.excludeTargets(vararg targets: View, exclude: Boolean = t
         excludeTarget(view, exclude)
     }
     return this
+}
+
+private fun Context.getStyledSpannable(@StringRes id: Int): Spannable {
+    val originalText = this.getText(id).toSpanned()
+    val styledSpannable = SpannableString(originalText)
+    originalText.getSpans<Annotation>().forEach { annotation ->
+        if (annotation.key == TextEmphasis.KEY) {
+            // TODO: Extract the color from the app theme
+            val color = getColorCompat(TextEmphasis.from(annotation.value).colorResId)
+            val selectionColor = ColorUtils.setAlphaComponent(color, 24 * 255 / 100)
+            val start = originalText.getSpanStart(annotation)
+            val end = originalText.getSpanEnd(annotation)
+            styledSpannable[start, end] = ForegroundColorSpan(color)
+            styledSpannable[start, end] = BackgroundColorSpan(selectionColor)
+        }
+    }
+    return styledSpannable
+}
+
+private enum class TextEmphasis(val key: String, @ColorRes val colorResId: Int) {
+    FOCUS("focus", R.color.colorFocus),
+    REST("rest", R.color.colorRest);
+
+    companion object {
+        const val KEY = "emphasis"
+
+        fun from(value: String): TextEmphasis {
+            return values().find { it.key == value }
+                    ?: throw IllegalArgumentException("Unknown emphasis style: $value")
+        }
+    }
 }

@@ -1,24 +1,11 @@
 package me.alex.pet.apps.focus.presentation.timer
 
 import android.app.Application
-import android.content.Context
-import android.text.Annotation
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
-import androidx.core.graphics.ColorUtils
-import androidx.core.text.getSpans
-import androidx.core.text.set
-import androidx.core.text.toSpanned
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.SingleLiveEvent
-import me.alex.pet.apps.focus.common.extensions.getColorCompat
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.SessionType
 import me.alex.pet.apps.focus.domain.Timer.State
@@ -39,12 +26,12 @@ class TimerModel(
 
     private val pomodoroObserver = object : Pomodoro.Observer {
         override fun onUpdate() {
-            _viewState.value = pomodoro.toViewState(app)
+            _viewState.value = pomodoro.toViewState()
         }
     }
 
     init {
-        _viewState.value = pomodoro.toViewState(app)
+        _viewState.value = pomodoro.toViewState()
         pomodoro.addObserver(pomodoroObserver)
     }
 
@@ -67,10 +54,11 @@ class TimerModel(
 }
 
 
-private fun Pomodoro.toViewState(context: Context): ViewState {
+private fun Pomodoro.toViewState(): ViewState {
     return ViewState(
             toTimerViewState(),
-            toTransitionPromptViewState(context),
+            toWorkIntro(),
+            toBreakIntro(),
             toSessionCountViewState(),
             toSessionIndicatorViewState(),
             toToggleBtnViewState(),
@@ -83,15 +71,12 @@ private fun Pomodoro.toResetBtnViewState(): ViewState.ResetButton {
     return ViewState.ResetButton(isVisible)
 }
 
-private fun Pomodoro.toTransitionPromptViewState(context: Context): ViewState.TransitionPrompt {
-    val styledText = when (nextSessionType) {
-        SessionType.WORK -> R.string.app_ready_to_start_a_work_session
-        else -> R.string.app_ready_to_take_a_break
-    }.let { resId -> context.getStyledSpannable(resId) }
-    return ViewState.TransitionPrompt(
-            isAwaitingSessionSwitch,
-            styledText
-    )
+private fun Pomodoro.toWorkIntro(): ViewState.WorkIntro {
+    return ViewState.WorkIntro(isAwaitingSessionSwitch && nextSessionType == SessionType.WORK)
+}
+
+private fun Pomodoro.toBreakIntro(): ViewState.BreakIntro {
+    return ViewState.BreakIntro(isAwaitingSessionSwitch && nextSessionType != SessionType.WORK)
 }
 
 private fun Pomodoro.toTimerViewState(): ViewState.Timer {
@@ -138,34 +123,3 @@ private fun Pomodoro.toToggleBtnViewState(): ViewState.ToggleButton {
 
 private val Pomodoro.isReset: Boolean
     get() = timerState == State.READY && completedWorkSessionCount == 0
-
-private fun Context.getStyledSpannable(@StringRes id: Int): Spannable {
-    val originalText = this.getText(id).toSpanned()
-    val styledSpannable = SpannableString(originalText)
-    originalText.getSpans<Annotation>().forEach { annotation ->
-        if (annotation.key == TextEmphasis.KEY) {
-            // TODO: Extract the color from the app theme
-            val color = getColorCompat(TextEmphasis.from(annotation.value).colorResId)
-            val selectionColor = ColorUtils.setAlphaComponent(color, 24 * 255 / 100)
-            val start = originalText.getSpanStart(annotation)
-            val end = originalText.getSpanEnd(annotation)
-            styledSpannable[start, end] = ForegroundColorSpan(color)
-            styledSpannable[start, end] = BackgroundColorSpan(selectionColor)
-        }
-    }
-    return styledSpannable
-}
-
-private enum class TextEmphasis(val key: String, @ColorRes val colorResId: Int) {
-    FOCUS("focus", R.color.colorFocus),
-    REST("rest", R.color.colorRest);
-
-    companion object {
-        const val KEY = "emphasis"
-
-        fun from(value: String): TextEmphasis {
-            return values().find { it.key == value }
-                    ?: throw IllegalArgumentException("Unknown emphasis style: $value")
-        }
-    }
-}
