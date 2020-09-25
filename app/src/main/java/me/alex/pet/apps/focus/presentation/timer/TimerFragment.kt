@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import com.google.android.material.transition.MaterialFade
 import me.alex.pet.apps.focus.R
-import me.alex.pet.apps.focus.common.extensions.animateVisibility
 import me.alex.pet.apps.focus.common.extensions.observe
 import me.alex.pet.apps.focus.common.extensions.requireAppContext
 import me.alex.pet.apps.focus.databinding.FragmentTimerBinding
@@ -87,13 +89,11 @@ class TimerFragment : Fragment() {
         completedSessionsTv.apply {
             text = state.sessionCount.text
             isVisible = state.sessionCount.isVisible
-            alpha = if (state.sessionCount.isVisible) 1f else 0f
         }
 
         sessionTypeIv.apply {
             setImageDrawable(requireContext().getDrawable(state.sessionIndicator.iconRes))
             isVisible = state.sessionIndicator.isVisible
-            alpha = if (state.sessionIndicator.isVisible) 1f else 0f
         }
 
         toggleFab.apply {
@@ -103,11 +103,14 @@ class TimerFragment : Fragment() {
 
         resetBtn.apply {
             isVisible = state.resetButton.isVisible
-            alpha = if (state.resetButton.isVisible) 1f else 0f
         }
     }
 
     private fun renderWithAnimations(state: ViewState) = binding.apply {
+        MaterialFade().setDuration(200)
+                .excludeTargets(timerTv, sessionSwitchPromptTv, toggleFab, toolbar)
+                .let { fade -> TransitionManager.beginDelayedTransition(root, fade) }
+
         timerTv.apply {
             isVisible = state.timer.isVisible
             text = state.timer.text
@@ -121,14 +124,14 @@ class TimerFragment : Fragment() {
         diff(lastState, state, ViewState::sessionCount) { count ->
             completedSessionsTv.apply {
                 text = count.text
-                animateVisibility(count.isVisible)
+                isVisible = count.isVisible
             }
         }
 
         diff(lastState, state, ViewState::sessionIndicator) { indicator ->
             sessionTypeIv.apply {
                 setImageDrawable(requireContext().getDrawable(indicator.iconRes))
-                animateVisibility(indicator.isVisible)
+                isVisible = indicator.isVisible
             }
         }
 
@@ -138,7 +141,7 @@ class TimerFragment : Fragment() {
         }
 
         diff(lastState, state, ViewState::resetButton) { resetButton ->
-            resetBtn.animateVisibility(resetButton.isVisible)
+            resetBtn.isVisible = resetButton.isVisible
         }
     }
 
@@ -174,4 +177,11 @@ private inline fun <S, P> diff(oldState: S?, newState: S, getPropertyFrom: (S) -
             }
         }
     }
+}
+
+private fun Transition.excludeTargets(vararg targets: View, exclude: Boolean = true): Transition {
+    targets.forEach { view ->
+        excludeTarget(view, exclude)
+    }
+    return this
 }
