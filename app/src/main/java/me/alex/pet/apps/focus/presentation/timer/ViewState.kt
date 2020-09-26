@@ -40,12 +40,18 @@ data class ViewState(
     data class ToggleButton(
             val action: Action
     ) {
-        enum class Action(val textRes: Int, val iconRes: Int) {
-            START(R.string.app_action_start, R.drawable.ic_action_start),
-            PAUSE(R.string.app_action_pause, R.drawable.ic_action_pause),
-            RESUME(R.string.app_action_resume, R.drawable.ic_action_start),
-            START_WORK(R.string.app_start_work_session, R.drawable.ic_action_switch_session),
-            START_BREAK(R.string.app_start_break, R.drawable.ic_action_switch_session)
+        enum class Action(val textRes: Int, val icon: Icon) {
+            START(R.string.app_action_start, Icon.START),
+            PAUSE(R.string.app_action_pause, Icon.PAUSE),
+            RESUME(R.string.app_action_resume, Icon.START),
+            START_WORK(R.string.app_start_work_session, Icon.SWITCH_SESSION),
+            START_BREAK(R.string.app_start_break, Icon.SWITCH_SESSION)
+        }
+
+        enum class Icon(@DrawableRes val iconRes: Int) {
+            START(R.drawable.ic_action_start),
+            PAUSE(R.drawable.ic_action_pause),
+            SWITCH_SESSION(R.drawable.ic_action_switch_session)
         }
     }
 

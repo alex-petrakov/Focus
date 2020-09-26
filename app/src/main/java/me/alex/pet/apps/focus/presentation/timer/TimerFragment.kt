@@ -2,6 +2,7 @@ package me.alex.pet.apps.focus.presentation.timer
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.text.Annotation
 import android.text.Spannable
@@ -13,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
 import androidx.core.text.getSpans
@@ -34,6 +36,8 @@ import me.alex.pet.apps.focus.presentation.HostActivity
 import me.alex.pet.apps.focus.presentation.notificationservice.NotificationService
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+private typealias Icon = ViewState.ToggleButton.Icon
+
 class TimerFragment : Fragment() {
 
     private var _binding: FragmentTimerBinding? = null
@@ -43,6 +47,19 @@ class TimerFragment : Fragment() {
     private val model by viewModel<TimerModel>()
 
     private var lastState: ViewState? = null
+
+    private val iconTransitionDrawables: Map<Icon, Map<Icon, Int>> = mapOf(
+            Icon.START to mapOf(
+                    Icon.PAUSE to R.drawable.ic_start_to_pause
+            ),
+            Icon.PAUSE to mapOf(
+                    Icon.START to R.drawable.ic_pause_to_start,
+                    Icon.SWITCH_SESSION to R.drawable.ic_pause_to_hourglass
+            ),
+            Icon.SWITCH_SESSION to mapOf(
+                    Icon.START to R.drawable.ic_hourglass_to_start
+            )
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentTimerBinding.inflate(inflater, container, false)
@@ -115,7 +132,7 @@ class TimerFragment : Fragment() {
         }
 
         toggleFab.apply {
-            setImageResource(state.toggleButton.action.iconRes)
+            setImageResource(state.toggleButton.action.icon.iconRes)
             contentDescription = getString(state.toggleButton.action.textRes)
         }
 
@@ -157,14 +174,28 @@ class TimerFragment : Fragment() {
             }
         }
 
-        toggleFab.apply {
-            setImageResource(state.toggleButton.action.iconRes)
-            contentDescription = getString(state.toggleButton.action.textRes)
+        diff(lastState, state, ViewState::toggleButton) { toggle ->
+            val oldIcon = lastState?.toggleButton?.action?.icon
+            val newIcon = toggle.action.icon
+            val animatedDrawableRes = getAnimatedDrawableRes(oldIcon, newIcon)
+            if (animatedDrawableRes != null) {
+                toggleFab.setImageResource(animatedDrawableRes)
+                (toggleFab.drawable as Animatable).start()
+            } else {
+                toggleFab.setImageResource(newIcon.iconRes)
+            }
+
+            toggleFab.contentDescription = getString(toggle.action.textRes)
         }
 
         diff(lastState, state, ViewState::resetButton) { resetButton ->
             resetBtn.isVisible = resetButton.isVisible
         }
+    }
+
+    @DrawableRes
+    private fun getAnimatedDrawableRes(oldIcon: Icon?, newIcon: Icon): Int? {
+        return iconTransitionDrawables[oldIcon]?.get(newIcon)
     }
 
     private fun handleEffect(effect: ViewEffect) {
