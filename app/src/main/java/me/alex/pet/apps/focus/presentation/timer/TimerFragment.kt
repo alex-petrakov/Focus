@@ -22,12 +22,12 @@ import androidx.core.text.set
 import androidx.core.text.toSpanned
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.google.android.material.transition.MaterialFade
 import com.google.android.material.transition.MaterialFadeThrough
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.extensions.excludeTargets
 import me.alex.pet.apps.focus.common.extensions.getColorCompat
 import me.alex.pet.apps.focus.common.extensions.observe
 import me.alex.pet.apps.focus.common.extensions.requireAppContext
@@ -60,6 +60,26 @@ class TimerFragment : Fragment() {
                     Icon.START to R.drawable.ic_hourglass_to_start
             )
     )
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setUpTransitions()
+    }
+
+    private fun setUpTransitions() {
+        val mainContentTransition = MaterialFadeThrough().excludeTargets(
+                R.id.toolbar,
+                R.id.completed_sessions_tv,
+                R.id.session_type_iv
+        )
+        val toolbarTransition = MaterialFade().apply {
+            secondaryAnimatorProvider = null
+            excludeTarget(R.id.root, true)
+            excludeTarget(R.id.toolbar, false)
+        }
+        exitTransition = TransitionSet().addTransition(mainContentTransition)
+                .addTransition(toolbarTransition)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentTimerBinding.inflate(inflater, container, false)
@@ -230,13 +250,6 @@ private inline fun <S, P> diff(oldState: S?, newState: S, getPropertyFrom: (S) -
             }
         }
     }
-}
-
-private fun Transition.excludeTargets(vararg targets: View, exclude: Boolean = true): Transition {
-    targets.forEach { view ->
-        excludeTarget(view, exclude)
-    }
-    return this
 }
 
 private fun Context.getStyledSpannable(@StringRes id: Int): Spannable {
