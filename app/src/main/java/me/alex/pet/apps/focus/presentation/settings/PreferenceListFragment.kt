@@ -9,9 +9,11 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.core.content.edit
 import androidx.preference.*
+import me.alex.pet.apps.focus.BuildConfig
 import me.alex.pet.apps.focus.R
 import me.alex.pet.apps.focus.common.extensions.toIntMinutes
 import me.alex.pet.apps.focus.data.NotificationPrefs
+import me.alex.pet.apps.focus.data.PomodoroPrefs
 import me.alex.pet.apps.focus.domain.Pomodoro
 
 class PreferenceListFragment : PreferenceFragmentCompat() {
@@ -26,6 +28,9 @@ class PreferenceListFragment : PreferenceFragmentCompat() {
         val context = preferenceManager.context
         createPomodoroPreferenceCategory(context)
         createNotificationPreferenceCategory(context)
+        if (BuildConfig.DEBUG) {
+            createDeveloperPreferenceCategory(context)
+        }
     }
 
     private fun createPomodoroPreferenceCategory(context: Context) {
@@ -74,6 +79,18 @@ class PreferenceListFragment : PreferenceFragmentCompat() {
             }
 
             createVibrationOnOffPreference(context).also { pref ->
+                category.addPreference(pref)
+            }
+        }
+    }
+
+    private fun createDeveloperPreferenceCategory(context: Context) {
+        PreferenceCategory(context).let { category ->
+            category.title = getString(R.string.settings_category_dev)
+            category.key = getString(R.string.pref_category_dev)
+            preferenceScreen.addPreference(category)
+
+            createSessionShorteningOnOffPreference(context).also { pref ->
                 category.addPreference(pref)
             }
         }
@@ -214,5 +231,13 @@ private fun createVibrationOnOffPreference(context: Context): Preference {
         key = context.getString(R.string.pref_vibration_on_off)
         title = context.getString(R.string.settings_enable_vibration)
         setDefaultValue(NotificationPrefs.defaultVibrationIsEnabled)
+    }
+}
+
+private fun createSessionShorteningOnOffPreference(context: Context): Preference {
+    return SwitchPreference(context).apply {
+        title = context.getString(R.string.settings_enable_session_shortening)
+        key = context.getString(R.string.pref_session_shortening_on_off)
+        setDefaultValue(PomodoroPrefs.DevOptions.defaultSessionShorteningOnOff)
     }
 }

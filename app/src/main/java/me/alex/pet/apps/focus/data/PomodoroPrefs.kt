@@ -4,41 +4,51 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.chibatching.kotpref.KotprefModel
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.common.extensions.toInt
 import me.alex.pet.apps.focus.common.extensions.toIntMinutes
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.PomodoroSettings
 import me.alex.pet.apps.focus.domain.PomodoroSettings.Observer
 import timber.log.Timber
 import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings {
 
     override val kotprefName = context.getString(R.string.prefs_app)
 
     override var workDuration: Duration
-        get() = Duration.ofMinutes(_workDurationInMinutes.toLong())
+        get() = Duration.of(workDurationValue.toLong(), timeUnit)
         set(value) {
-            _workDurationInMinutes = value.toIntMinutes()
+            workDurationValue = value.toInt(timeUnit)
         }
-    private var _workDurationInMinutes by intPref(Pomodoro.defaultWorkDuration.toIntMinutes(), R.string.pref_work_duration)
+    private var workDurationValue by intPref(Pomodoro.defaultWorkDuration.toIntMinutes(), R.string.pref_work_duration)
 
     override var shortBreakDuration: Duration
-        get() = Duration.ofMinutes(_shortBreakDurationInMinutes.toLong())
+        get() = Duration.of(shortBreakDurationValue.toLong(), timeUnit)
         set(value) {
-            _workDurationInMinutes = value.toIntMinutes()
+            shortBreakDurationValue = value.toInt(timeUnit)
         }
-    private var _shortBreakDurationInMinutes by intPref(Pomodoro.defaultShortBreakDuration.toIntMinutes(), R.string.pref_short_break_duration)
+    private var shortBreakDurationValue by intPref(Pomodoro.defaultShortBreakDuration.toIntMinutes(), R.string.pref_short_break_duration)
 
     override var longBreakDuration: Duration
-        get() = Duration.ofMinutes(_longBreakDurationInMinutes.toLong())
+        get() = Duration.of(longBreakDurationValue.toLong(), timeUnit)
         set(value) {
-            _longBreakDurationInMinutes = value.toIntMinutes()
+            longBreakDurationValue = value.toInt(timeUnit)
         }
-    private var _longBreakDurationInMinutes by intPref(Pomodoro.defaultLongBreakDuration.toIntMinutes(), R.string.pref_long_break_duration)
+    private var longBreakDurationValue by intPref(Pomodoro.defaultLongBreakDuration.toIntMinutes(), R.string.pref_long_break_duration)
 
     override var longBreaksAreEnabled by booleanPref(Pomodoro.defaultLongBreaksAreEnabled, R.string.pref_long_breaks_are_enabled)
 
     override var numberOfSessionsBetweenLongBreaks by intPref(Pomodoro.defaultLongBreakFrequency, R.string.pref_long_break_frequency)
+
+    private val sessionShorteningIsEnabled by booleanPref(DevOptions.defaultSessionShorteningOnOff, R.string.pref_session_shortening_on_off)
+
+    private val timeUnit
+        get() = when (sessionShorteningIsEnabled) {
+            true -> ChronoUnit.SECONDS
+            else -> ChronoUnit.MINUTES
+        }
 
     // OnSharedPreferenceChangeListeners are stored in a WeakHashMap, so we need to store
     // an explicit reference to the listener to prevent it from being garbage-collected.
@@ -53,7 +63,8 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
                 context.getString(R.string.pref_short_break_duration),
                 context.getString(R.string.pref_long_break_duration),
                 context.getString(R.string.pref_long_break_frequency),
-                context.getString(R.string.pref_long_breaks_are_enabled)
+                context.getString(R.string.pref_long_breaks_are_enabled),
+                context.getString(R.string.pref_session_shortening_on_off)
         )
 
         override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
@@ -86,5 +97,9 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
 
     private fun notifyAboutPomodoroSettingChange() {
         observers.forEach { it.onSettingsChange() }
+    }
+
+    object DevOptions {
+        const val defaultSessionShorteningOnOff = false
     }
 }
