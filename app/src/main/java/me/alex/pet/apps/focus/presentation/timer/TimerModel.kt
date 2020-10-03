@@ -80,9 +80,15 @@ private fun Pomodoro.toBreakIntro(): ViewState.BreakIntro {
 }
 
 private fun Pomodoro.toTimerViewState(): ViewState.Timer {
+    val minutes = remainingDuration.seconds / 60
+    val seconds = remainingDuration.seconds % 60
+    val timerText = when (minutes) {
+        0L -> seconds.toString()
+        else -> String.format("%d:%02d", minutes, seconds)
+    }
     return ViewState.Timer(
             !isAwaitingSessionSwitch,
-            remainingDuration.seconds.toString(),
+            timerText,
             timerState == State.PAUSED
     )
 }
