@@ -1,5 +1,6 @@
 package me.alex.pet.apps.focus.presentation.timer
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Animatable
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -135,6 +137,7 @@ class TimerFragment : Fragment() {
         timerTv.apply {
             isVisible = state.timer.isVisible
             text = state.timer.text
+            blink(state.timer.isBlinking)
         }
 
         workIntroTv.isVisible = state.workIntro.isVisible
@@ -174,6 +177,7 @@ class TimerFragment : Fragment() {
         timerTv.apply {
             isVisible = state.timer.isVisible
             text = state.timer.text
+            blink(state.timer.isBlinking)
         }
 
         workIntroTv.isVisible = state.workIntro.isVisible
@@ -279,6 +283,36 @@ private enum class TextEmphasis(val key: String, @ColorRes val colorResId: Int) 
         fun from(value: String): TextEmphasis {
             return values().find { it.key == value }
                     ?: throw IllegalArgumentException("Unknown emphasis style: $value")
+        }
+    }
+}
+
+private fun View.blink(blink: Boolean) {
+    when {
+        blink -> this.startBlinking()
+        else -> this.stopBlinking()
+    }
+}
+
+private fun View.startBlinking() {
+    val animator = ObjectAnimator.ofFloat(this, "alpha", 1.0f, 0.2f).apply {
+        repeatMode = ObjectAnimator.REVERSE
+        repeatCount = ObjectAnimator.INFINITE
+        duration = 1000L
+        interpolator = LinearInterpolator()
+        setAutoCancel(true)
+        start()
+    }
+    this.tag = animator
+}
+
+private fun View.stopBlinking() {
+    val viewTag = this.tag
+    if (viewTag is ObjectAnimator) {
+        viewTag.cancel()
+        this.apply {
+            alpha = 1f
+            tag = null
         }
     }
 }
