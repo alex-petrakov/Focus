@@ -1,6 +1,7 @@
 package me.alex.pet.apps.focus.presentation.timer
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,12 +27,12 @@ class TimerModel(
 
     private val pomodoroObserver = object : Pomodoro.Observer {
         override fun onUpdate() {
-            _viewState.value = pomodoro.toViewState()
+            _viewState.value = pomodoro.toViewState(app)
         }
     }
 
     init {
-        _viewState.value = pomodoro.toViewState()
+        _viewState.value = pomodoro.toViewState(app)
         pomodoro.addObserver(pomodoroObserver)
     }
 
@@ -54,9 +55,9 @@ class TimerModel(
 }
 
 
-private fun Pomodoro.toViewState(): ViewState {
+private fun Pomodoro.toViewState(context: Context): ViewState {
     return ViewState(
-            toTimerViewState(),
+            toTimerViewState(context),
             toWorkIntro(),
             toBreakIntro(),
             toSessionCountViewState(),
@@ -79,12 +80,12 @@ private fun Pomodoro.toBreakIntro(): ViewState.BreakIntro {
     return ViewState.BreakIntro(isAwaitingSessionSwitch && nextSessionType != SessionType.WORK)
 }
 
-private fun Pomodoro.toTimerViewState(): ViewState.Timer {
+private fun Pomodoro.toTimerViewState(context: Context): ViewState.Timer {
     val minutes = remainingDuration.seconds / 60
     val seconds = remainingDuration.seconds % 60
     val timerText = when (minutes) {
         0L -> seconds.toString()
-        else -> String.format("%d:%02d", minutes, seconds)
+        else -> context.getString(R.string.app_duration_minutes_seconds_format, minutes, seconds)
     }
     return ViewState.Timer(
             !isAwaitingSessionSwitch,

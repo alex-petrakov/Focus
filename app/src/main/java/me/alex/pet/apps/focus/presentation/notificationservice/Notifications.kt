@@ -69,7 +69,7 @@ class Notifications(private val context: Context) {
 
         val minutes = remainingSeconds / 60
         val seconds = remainingSeconds % 60
-        val contentTitle = context.getString(R.string.app_duration_hours_seconds_format, minutes, seconds)
+        val contentTitle = context.getString(R.string.app_duration_minutes_seconds_format, minutes, seconds)
         val contentText = when (type) {
             SessionType.WORK -> R.string.notifications_work_session
             else -> R.string.notifications_break
