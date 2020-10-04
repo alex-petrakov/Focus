@@ -22,27 +22,27 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
         set(value) {
             workDurationValue = value.toInt(timeUnit)
         }
-    private var workDurationValue by intPref(Pomodoro.defaultWorkDuration.toIntMinutes(), R.string.pref_work_duration)
+    private var workDurationValue by intPref(Pomodoro.DEFAULT_WORK_DURATION.toIntMinutes(), R.string.pref_work_duration)
 
     override var shortBreakDuration: Duration
         get() = Duration.of(shortBreakDurationValue.toLong(), timeUnit)
         set(value) {
             shortBreakDurationValue = value.toInt(timeUnit)
         }
-    private var shortBreakDurationValue by intPref(Pomodoro.defaultShortBreakDuration.toIntMinutes(), R.string.pref_short_break_duration)
+    private var shortBreakDurationValue by intPref(Pomodoro.DEFAULT_SHORT_BREAK_DURATION.toIntMinutes(), R.string.pref_short_break_duration)
 
     override var longBreakDuration: Duration
         get() = Duration.of(longBreakDurationValue.toLong(), timeUnit)
         set(value) {
             longBreakDurationValue = value.toInt(timeUnit)
         }
-    private var longBreakDurationValue by intPref(Pomodoro.defaultLongBreakDuration.toIntMinutes(), R.string.pref_long_break_duration)
+    private var longBreakDurationValue by intPref(Pomodoro.DEFAULT_LONG_BREAK_DURATION.toIntMinutes(), R.string.pref_long_break_duration)
 
-    override var longBreaksAreEnabled by booleanPref(Pomodoro.defaultLongBreaksAreEnabled, R.string.pref_long_breaks_are_enabled)
+    override var longBreaksAreEnabled by booleanPref(Pomodoro.DEFAULT_LONG_BREAKS_ARE_ENABLED, R.string.pref_long_breaks_are_enabled)
 
-    override var numberOfSessionsBetweenLongBreaks by intPref(Pomodoro.defaultLongBreakFrequency, R.string.pref_long_break_frequency)
+    override var numberOfSessionsBetweenLongBreaks by intPref(Pomodoro.DEFAULT_LONG_BREAK_FREQUENCY, R.string.pref_long_break_frequency)
 
-    private val sessionShorteningIsEnabled by booleanPref(DevOptions.defaultSessionShorteningOnOff, R.string.pref_session_shortening_on_off)
+    private val sessionShorteningIsEnabled by booleanPref(DevOptions.DEFAULT_SESSION_SHORTENING_ON_OFF, R.string.pref_session_shortening_on_off)
 
     private val timeUnit
         get() = when (sessionShorteningIsEnabled) {
@@ -100,6 +100,6 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
     }
 
     object DevOptions {
-        const val defaultSessionShorteningOnOff = false
+        const val DEFAULT_SESSION_SHORTENING_ON_OFF = false
     }
 }

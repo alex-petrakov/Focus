@@ -151,10 +151,10 @@ class Pomodoro constructor(
     }
 
     companion object {
-        val defaultWorkDuration = 25.minutes
-        val defaultShortBreakDuration = 5.minutes
-        val defaultLongBreakDuration = 15.minutes
-        const val defaultLongBreakFrequency = 3
-        const val defaultLongBreaksAreEnabled = true
+        val DEFAULT_WORK_DURATION = 25.minutes
+        val DEFAULT_SHORT_BREAK_DURATION = 5.minutes
+        val DEFAULT_LONG_BREAK_DURATION = 15.minutes
+        const val DEFAULT_LONG_BREAK_FREQUENCY = 3
+        const val DEFAULT_LONG_BREAKS_ARE_ENABLED = true
     }
 }

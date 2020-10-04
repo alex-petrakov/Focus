@@ -10,28 +10,28 @@ class NotificationPrefs(context: Context) : KotprefModel(context) {
 
     override val kotprefName: String = context.getString(R.string.prefs_app)
 
-    val soundIsEnabled: Boolean by booleanPref(defaultSoundIsEnabled, R.string.pref_sound_on_off)
+    val soundIsEnabled: Boolean by booleanPref(DEFAULT_SOUND_IS_ENABLED, R.string.pref_sound_on_off)
 
     val soundUri: Uri
         get() = Uri.parse(soundUriString)
-    private val soundUriString: String by stringPref(defaultNotificationSoundUri.toString(), R.string.pref_sound)
+    private val soundUriString: String by stringPref(DEFAULT_NOTIFICATION_SOUND_URI.toString(), R.string.pref_sound)
 
-    val vibrationIsEnabled: Boolean by booleanPref(defaultVibrationIsEnabled, R.string.pref_vibration_on_off)
+    val vibrationIsEnabled: Boolean by booleanPref(DEFAULT_VIBRATION_IS_ENABLED, R.string.pref_vibration_on_off)
 
-    val vibrationPattern: LongArray = defaultVibrationPattern
+    val vibrationPattern: LongArray = DEFAULT_VIBRATION_PATTERN.toLongArray()
 
-    val soundChannel: NotificationSoundPlayer.SoundChannel = defaultSoundChannel
+    val soundChannel: NotificationSoundPlayer.SoundChannel = DEFAULT_SOUND_CHANNEL
 
 
     companion object {
-        const val defaultSoundIsEnabled: Boolean = true
+        const val DEFAULT_SOUND_IS_ENABLED: Boolean = true
 
-        val defaultNotificationSoundUri: Uri = Settings.System.DEFAULT_NOTIFICATION_URI
+        val DEFAULT_NOTIFICATION_SOUND_URI: Uri = Settings.System.DEFAULT_NOTIFICATION_URI
 
-        const val defaultVibrationIsEnabled: Boolean = true
+        const val DEFAULT_VIBRATION_IS_ENABLED: Boolean = true
 
-        val defaultVibrationPattern: LongArray = longArrayOf(0L, 250L, 250L, 250L, 250L)
+        val DEFAULT_VIBRATION_PATTERN: List<Long> = listOf(0L, 250L, 250L, 250L, 250L)
 
-        val defaultSoundChannel: NotificationSoundPlayer.SoundChannel = NotificationSoundPlayer.SoundChannel.NOTIFICATION
+        val DEFAULT_SOUND_CHANNEL: NotificationSoundPlayer.SoundChannel = NotificationSoundPlayer.SoundChannel.NOTIFICATION
     }
 }

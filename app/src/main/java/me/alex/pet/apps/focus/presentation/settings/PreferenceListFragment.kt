@@ -72,7 +72,7 @@ class PreferenceListFragment : PreferenceFragmentCompat() {
                 category.addPreference(pref)
                 pref.dependency = soundOnOffPreference.key
 
-                val storedUriString = pref.sharedPreferences.getString(pref.key, NotificationPrefs.defaultNotificationSoundUri.toString())
+                val storedUriString = pref.sharedPreferences.getString(pref.key, NotificationPrefs.DEFAULT_NOTIFICATION_SOUND_URI.toString())
                 val ringtoneUri = Uri.parse(storedUriString)
                 val ringtoneTitle = RingtoneManager.getRingtone(context, ringtoneUri).getTitle(context)
                 pref.summary = ringtoneTitle
@@ -101,7 +101,7 @@ class PreferenceListFragment : PreferenceFragmentCompat() {
         soundPreference.setOnPreferenceClickListener { preference ->
             val pickerTitle = preference.context.getString(R.string.settings_notification_sound)
 
-            val storedUriString = preference.sharedPreferences.getString(preference.key, NotificationPrefs.defaultNotificationSoundUri.toString())
+            val storedUriString = preference.sharedPreferences.getString(preference.key, NotificationPrefs.DEFAULT_NOTIFICATION_SOUND_URI.toString())
             val ringtoneUri = Uri.parse(storedUriString)
 
             val intent = createRingtonePickerIntent(pickerTitle, ringtoneUri)
@@ -164,7 +164,7 @@ private fun createWorkDurationPreference(context: Context): Preference {
         title = context.getString(R.string.settings_focus_session_duration)
         min = 15
         max = 90
-        setDefaultValue(Pomodoro.defaultWorkDuration.toIntMinutes())
+        setDefaultValue(Pomodoro.DEFAULT_WORK_DURATION.toIntMinutes())
         showSeekBarValue = true
     }
 }
@@ -175,7 +175,7 @@ private fun createShortBreakDurationPreference(context: Context): Preference {
         title = context.getString(R.string.settings_short_break_duration)
         min = 1
         max = 30
-        setDefaultValue(Pomodoro.defaultShortBreakDuration.toIntMinutes())
+        setDefaultValue(Pomodoro.DEFAULT_SHORT_BREAK_DURATION.toIntMinutes())
         showSeekBarValue = true
     }
 }
@@ -184,7 +184,7 @@ private fun createLongBreakOnOffPreference(context: Context): Preference {
     return SwitchPreference(context).apply {
         key = context.getString(R.string.pref_long_breaks_are_enabled)
         title = context.getString(R.string.settings_enable_long_breaks)
-        setDefaultValue(Pomodoro.defaultLongBreaksAreEnabled)
+        setDefaultValue(Pomodoro.DEFAULT_LONG_BREAKS_ARE_ENABLED)
     }
 }
 
@@ -194,7 +194,7 @@ private fun createLongBreakDurationPreference(context: Context): Preference {
         title = context.getString(R.string.settings_long_break_duration)
         min = 1
         max = 30
-        setDefaultValue(Pomodoro.defaultLongBreakDuration.toIntMinutes())
+        setDefaultValue(Pomodoro.DEFAULT_LONG_BREAK_DURATION.toIntMinutes())
         showSeekBarValue = true
     }
 }
@@ -205,7 +205,7 @@ private fun createLongBreakFrequencyPreference(context: Context): Preference {
         title = context.getString(R.string.settings_session_count_between_long_breaks)
         min = 1
         max = 10
-        setDefaultValue(Pomodoro.defaultLongBreakFrequency)
+        setDefaultValue(Pomodoro.DEFAULT_LONG_BREAK_FREQUENCY)
         showSeekBarValue = true
     }
 }
@@ -214,7 +214,7 @@ private fun createSoundOnOffPreference(context: Context): Preference {
     return SwitchPreference(context).apply {
         key = context.getString(R.string.pref_sound_on_off)
         title = context.getString(R.string.settings_enable_notification_sound)
-        setDefaultValue(NotificationPrefs.defaultSoundIsEnabled)
+        setDefaultValue(NotificationPrefs.DEFAULT_SOUND_IS_ENABLED)
     }
 }
 
@@ -222,7 +222,7 @@ private fun createSoundPreference(context: Context): Preference {
     return Preference(context).apply {
         key = context.getString(R.string.pref_sound)
         title = context.getString(R.string.settings_notification_sound)
-        setDefaultValue(NotificationPrefs.defaultNotificationSoundUri)
+        setDefaultValue(NotificationPrefs.DEFAULT_NOTIFICATION_SOUND_URI)
     }
 }
 
@@ -230,7 +230,7 @@ private fun createVibrationOnOffPreference(context: Context): Preference {
     return SwitchPreference(context).apply {
         key = context.getString(R.string.pref_vibration_on_off)
         title = context.getString(R.string.settings_enable_vibration)
-        setDefaultValue(NotificationPrefs.defaultVibrationIsEnabled)
+        setDefaultValue(NotificationPrefs.DEFAULT_VIBRATION_IS_ENABLED)
     }
 }
 
@@ -238,6 +238,6 @@ private fun createSessionShorteningOnOffPreference(context: Context): Preference
     return SwitchPreference(context).apply {
         title = context.getString(R.string.settings_enable_session_shortening)
         key = context.getString(R.string.pref_session_shortening_on_off)
-        setDefaultValue(PomodoroPrefs.DevOptions.defaultSessionShorteningOnOff)
+        setDefaultValue(PomodoroPrefs.DevOptions.DEFAULT_SESSION_SHORTENING_ON_OFF)
     }
 }
