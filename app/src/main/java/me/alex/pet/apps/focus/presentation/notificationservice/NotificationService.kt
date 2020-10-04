@@ -44,9 +44,7 @@ class NotificationService : Service() {
             Timber.d("onReceive() action=$action")
             when (action) {
                 NotificationAction.PAUSE, NotificationAction.RESUME -> pomodoro.toggleSession()
-                NotificationAction.SWITCH_TO_NEXT_SESSION -> {
-                    pomodoro.startNextSession()
-                }
+                NotificationAction.SWITCH_TO_WORK_SESSION, NotificationAction.SWITCH_TO_BREAK -> pomodoro.startNextSession()
                 NotificationAction.RESET -> pomodoro.reset()
             }
         }
@@ -56,12 +54,13 @@ class NotificationService : Service() {
         }
     }
 
-    private val notifications = Notifications(this)
+    private lateinit var notifications: Notifications
 
     private var isRunning = false
 
     override fun onCreate() {
         Timber.d("onCreate()")
+        notifications = Notifications(this)
         val intentFilter = IntentFilter().apply {
             NotificationAction.values().forEach { action -> addAction(action.value) }
         }
