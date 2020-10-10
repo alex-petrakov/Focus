@@ -5,16 +5,22 @@ import android.net.Uri
 import android.provider.Settings
 import com.chibatching.kotpref.KotprefModel
 import me.alex.pet.apps.focus.R
+import me.alex.pet.apps.focus.data.prefextensions.Adapter
+import me.alex.pet.apps.focus.data.prefextensions.stringPref
 
 class NotificationPrefs(context: Context) : KotprefModel(context) {
 
     override val kotprefName: String = context.getString(R.string.prefs_app)
 
+    private val uriAdapter = object : Adapter<Uri, String> {
+        override fun toPref(value: Uri): String = value.toString()
+
+        override fun fromPref(prefValue: String): Uri = Uri.parse(prefValue)
+    }
+
     val soundIsEnabled: Boolean by booleanPref(DEFAULT_SOUND_IS_ENABLED, R.string.pref_sound_on_off)
 
-    val soundUri: Uri
-        get() = Uri.parse(soundUriString)
-    private val soundUriString: String by stringPref(DEFAULT_NOTIFICATION_SOUND_URI.toString(), R.string.pref_sound)
+    val soundUri: Uri by stringPref(DEFAULT_NOTIFICATION_SOUND_URI, R.string.pref_sound, uriAdapter)
 
     val vibrationIsEnabled: Boolean by booleanPref(DEFAULT_VIBRATION_IS_ENABLED, R.string.pref_vibration_on_off)
 

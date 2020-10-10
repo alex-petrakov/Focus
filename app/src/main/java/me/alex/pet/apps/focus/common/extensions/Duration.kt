@@ -1,13 +1,10 @@
 package me.alex.pet.apps.focus.common.extensions
 
 import java.time.Duration
-import java.time.temporal.TemporalUnit
 
 val Duration.isPositive: Boolean get() = !(isNegative || isZero)
 
 fun Duration.toIntMinutes(): Int = this.toMinutes().clampToInt()
-
-fun Duration.toInt(unit: TemporalUnit): Int = this.get(unit).clampToInt()
 
 val Number.milliseconds: Duration get() = Duration.ofMillis(this.toLong())
 

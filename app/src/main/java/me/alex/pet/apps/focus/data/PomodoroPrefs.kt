@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.chibatching.kotpref.KotprefModel
 import me.alex.pet.apps.focus.R
-import me.alex.pet.apps.focus.common.extensions.toInt
-import me.alex.pet.apps.focus.common.extensions.toIntMinutes
+import me.alex.pet.apps.focus.data.prefextensions.Adapter
+import me.alex.pet.apps.focus.data.prefextensions.intPref
 import me.alex.pet.apps.focus.domain.Pomodoro
 import me.alex.pet.apps.focus.domain.PomodoroSettings
 import me.alex.pet.apps.focus.domain.PomodoroSettings.Observer
@@ -17,26 +17,46 @@ class PomodoroPrefs(context: Context) : KotprefModel(context), PomodoroSettings 
 
     override val kotprefName = context.getString(R.string.prefs_app)
 
-    override var workDuration: Duration
-        get() = Duration.of(workDurationValue.toLong(), timeUnit)
-        set(value) {
-            workDurationValue = value.toInt(timeUnit)
+    private val durationAdapter = object : Adapter<Duration, Int> {
+        override fun toPref(value: Duration): Int {
+            return when (timeUnit) {
+                ChronoUnit.MINUTES -> value.toMinutes().clampToInt()
+                ChronoUnit.SECONDS -> value.seconds.clampToInt()
+                else -> throw IllegalStateException()
+            }
         }
-    private var workDurationValue by intPref(Pomodoro.DEFAULT_WORK_DURATION.toIntMinutes(), R.string.pref_work_duration)
 
-    override var shortBreakDuration: Duration
-        get() = Duration.of(shortBreakDurationValue.toLong(), timeUnit)
-        set(value) {
-            shortBreakDurationValue = value.toInt(timeUnit)
+        override fun fromPref(prefValue: Int): Duration {
+            return Duration.of(prefValue.toLong(), timeUnit)
         }
-    private var shortBreakDurationValue by intPref(Pomodoro.DEFAULT_SHORT_BREAK_DURATION.toIntMinutes(), R.string.pref_short_break_duration)
 
-    override var longBreakDuration: Duration
-        get() = Duration.of(longBreakDurationValue.toLong(), timeUnit)
-        set(value) {
-            longBreakDurationValue = value.toInt(timeUnit)
+        private fun Long.clampToInt(): Int {
+            return when {
+                this > Int.MAX_VALUE -> Int.MAX_VALUE
+                this < Int.MIN_VALUE -> Int.MIN_VALUE
+                else -> this.toInt()
+            }
         }
-    private var longBreakDurationValue by intPref(Pomodoro.DEFAULT_LONG_BREAK_DURATION.toIntMinutes(), R.string.pref_long_break_duration)
+    }
+
+    override var workDuration: Duration by intPref(
+            Pomodoro.DEFAULT_WORK_DURATION,
+            R.string.pref_work_duration,
+            durationAdapter
+    )
+
+    override var shortBreakDuration: Duration by intPref(
+            Pomodoro.DEFAULT_SHORT_BREAK_DURATION,
+            R.string.pref_short_break_duration,
+            durationAdapter
+    )
+
+
+    override var longBreakDuration: Duration by intPref(
+            Pomodoro.DEFAULT_LONG_BREAK_DURATION,
+            R.string.pref_long_break_duration,
+            durationAdapter
+    )
 
     override var longBreaksAreEnabled by booleanPref(Pomodoro.DEFAULT_LONG_BREAKS_ARE_ENABLED, R.string.pref_long_breaks_are_enabled)
 
